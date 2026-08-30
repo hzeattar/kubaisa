@@ -16,6 +16,7 @@ export const translations = {
       qualityHigh: 'عالية',
       qualityMedium: 'متوسطة',
       qualityLow: 'منخفضة',
+      moveHint: 'استخدم WASD أو الأسهم للحركة والماوس للنظر',
     },
     floors: {
       lobby: 'بهو القصر',
@@ -57,6 +58,7 @@ export const translations = {
       qualityHigh: 'High',
       qualityMedium: 'Medium',
       qualityLow: 'Low',
+      moveHint: 'Use WASD or arrow keys to move and the mouse to look',
     },
     floors: {
       lobby: 'Grand Lobby',

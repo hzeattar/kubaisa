@@ -1,7 +1,7 @@
 {
-  "name": "react-example",
+  "name": "qubaisa-virtual-palace",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -9,8 +9,9 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "preview": "vite preview --host=0.0.0.0",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "start": "node server.js"
   },
