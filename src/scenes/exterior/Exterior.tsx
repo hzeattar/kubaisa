@@ -97,7 +97,7 @@ export const Exterior: React.FC = () => {
             position={[0, 0.3, 0.2]}
             fontSize={1.2}
             color="#d4af37"
-            font="https://fonts.gstatic.com/s/cairo/v28/SLXVc1nY6Hkvalvtsw.woff"
+            font="https://fonts.gstatic.com/s/cairo/v31/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hAc5W1Q.ttf"
             anchorX="center"
             anchorY="middle"
           >
@@ -108,7 +108,7 @@ export const Exterior: React.FC = () => {
             position={[0, -0.6, 0.2]}
             fontSize={0.4}
             color="#d4af37"
-            font="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtM.woff"
+            font="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDQ.ttf"
             anchorX="center"
             anchorY="middle"
           >

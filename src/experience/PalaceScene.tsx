@@ -31,8 +31,7 @@ export const PalaceScene: React.FC = () => {
       </directionalLight>
       
       <Sky sunPosition={[30, 20, 30]} turbidity={0.3} rayleigh={1.2} mieCoefficient={0.005} mieDirectionalG={0.7} />
-      {/* We can use a city environment for subtle reflections */}
-      <Environment preset="city" background={false} />
+      {/* Environment removed to prevent CDN loading issues causing black screen */}
 
       {/* The Palace Architecture */}
       <group>
