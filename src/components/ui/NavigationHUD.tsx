@@ -100,6 +100,12 @@ export const NavigationHUD: React.FC = () => {
         
         <div className="flex gap-2">
           <button 
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-[#d4af37]/30 text-[#d4af37] rounded transition-colors text-sm font-semibold"
+            onClick={() => useAppStore.getState().setLanguage(useAppStore.getState().language === 'ar' ? 'en' : 'ar')}
+          >
+            {useAppStore.getState().language === 'ar' ? 'EN' : 'العربية'}
+          </button>
+          <button 
             className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded transition-colors text-sm"
             onClick={() => setMode(mode === 'explore' ? 'guided-tour' : 'explore')}
           >

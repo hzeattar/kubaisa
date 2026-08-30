@@ -1,2 +1,0 @@
-# Performance
-Suspense, Instancing, adaptive.

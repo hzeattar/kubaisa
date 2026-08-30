@@ -1,36 +1,51 @@
-import React from 'react';
-import { Sky, Stars } from '@react-three/drei';
+import React, { Suspense } from 'react';
+import { Sky, Environment, BakeShadows } from '@react-three/drei';
 import { FirstPersonCamera } from './camera/FirstPersonCamera';
 import { Exterior } from '../scenes/exterior/Exterior';
 import { Lobby } from '../scenes/lobby/Lobby';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
 import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
+import { GuidedTour } from './camera/GuidedTour';
+import { useAppStore } from '../stores/useAppStore';
 
 export const PalaceScene: React.FC = () => {
+  const activeZone = useAppStore(state => state.activeZone);
+  
   return (
     <>
       <FirstPersonCamera />
+      <GuidedTour />
       
-      {/* Lighting & Environment */}
-      <ambientLight intensity={0.4} />
-      <hemisphereLight skyColor="#ffffff" groundColor="#444444" intensity={0.6} />
+      {/* Lighting & Environment - Golden Hour */}
+      <ambientLight intensity={0.2} color="#ffedd6" />
+      <hemisphereLight args={['#ffedd6', '#332a22', 0.4]} />
       <directionalLight 
-        position={[50, 50, 20]} 
-        intensity={1.5} 
+        position={[30, 20, 30]} 
+        intensity={1.2} 
+        color="#ffedd6"
         castShadow
-        shadow-bias={-0.0001}
-        shadow-mapSize={[2048, 2048]}
-      />
+        shadow-bias={-0.0005}
+        shadow-mapSize={[1024, 1024]}
+      >
+        <orthographicCamera attach="shadow-camera" args={[-30, 30, 30, -30, 0.5, 100]} />
+      </directionalLight>
       
-      <Sky sunPosition={[50, 50, 20]} turbidity={0.1} rayleigh={0.5} />
-      <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={1} />
-      
+      <Sky sunPosition={[30, 20, 30]} turbidity={0.3} rayleigh={1.2} mieCoefficient={0.005} mieDirectionalG={0.7} />
+      {/* We can use a city environment for subtle reflections */}
+      <Environment preset="city" background={false} />
+
       {/* The Palace Architecture */}
       <group>
         <Exterior />
         <Lobby />
-        <ModernLiving />
-        <NeoClassicLiving />
+        {/* Living modern goes to the left of the lobby */}
+        <group position={[-25, 0, -20]}>
+          <ModernLiving />
+        </group>
+        {/* Living classic goes to the right of the lobby */}
+        <group position={[25, 0, -20]}>
+          <NeoClassicLiving />
+        </group>
       </group>
     </>
   );
