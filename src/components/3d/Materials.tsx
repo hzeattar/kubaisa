@@ -41,12 +41,26 @@ export const useSharedTextures = () => {
     roughnessMap: '/textures/metal/Metal034_1K-JPG_Roughness.jpg',
   });
 
+  const fabricModern = useTexture({
+    map: '/textures/fabric_modern/Fabric030_1K-JPG_Color.jpg',
+    normalMap: '/textures/fabric_modern/Fabric030_1K-JPG_NormalGL.jpg',
+    roughnessMap: '/textures/fabric_modern/Fabric030_1K-JPG_Roughness.jpg',
+  });
+
+  const fabricClassic = useTexture({
+    map: '/textures/fabric_classic/Fabric042_1K-JPG_Color.jpg',
+    normalMap: '/textures/fabric_classic/Fabric042_1K-JPG_NormalGL.jpg',
+    roughnessMap: '/textures/fabric_classic/Fabric042_1K-JPG_Roughness.jpg',
+  });
+
   useEffect(() => {
     configureTextureSet(marble, 4, 4);
     configureTextureSet(plaster, 8, 8);
     configureTextureSet(wood, 3, 3);
     configureTextureSet(metal, 2, 2);
-  }, [marble, plaster, wood, metal]);
+    configureTextureSet(fabricModern, 2, 2);
+    configureTextureSet(fabricClassic, 2, 2);
+  }, [marble, plaster, wood, metal, fabricModern, fabricClassic]);
 
-  return { marble, plaster, wood, metal };
+  return { marble, plaster, wood, metal, fabricModern, fabricClassic };
 };
