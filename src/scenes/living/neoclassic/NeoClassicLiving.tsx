@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAppStore } from '../../../stores/useAppStore';
+import { Hotspot } from '../../../components/3d/Hotspot';
 
 export const NeoClassicLiving: React.FC = () => {
   const { setSelectedProduct } = useAppStore();
@@ -12,12 +13,33 @@ export const NeoClassicLiving: React.FC = () => {
         <meshStandardMaterial color="#8a7969" roughness={0.9} /> {/* Classical Rug */}
       </mesh>
 
+      {/* Walls */}
+      <mesh position={[0, 2.5, -5]} receiveShadow>
+        <boxGeometry args={[10, 5, 0.2]} />
+        <meshStandardMaterial color="#fdfbf7" roughness={0.8} />
+      </mesh>
+      <mesh position={[5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[10, 5, 0.2]} />
+        <meshStandardMaterial color="#e5e0d8" roughness={0.9} />
+      </mesh>
+
+      {/* Hotspot pointing to the product */}
+      <Hotspot 
+        position={[0, 1.8, -2]} 
+        productId="salon-classic-01" 
+        labelAr="صالون نيو كلاسيك" 
+        labelEn="Neo-Classic Salon" 
+      />
+
       {/* Placeholder Sofa - Neo-Classic */}
       <mesh 
         position={[0, 0.5, -2]} 
         castShadow 
         receiveShadow
-        onClick={() => setSelectedProduct('salon-classic-01')}
+        onClick={(e) => {
+          e.stopPropagation();
+          setSelectedProduct('salon-classic-01');
+        }}
         onPointerOver={() => document.body.style.cursor = 'pointer'}
         onPointerOut={() => document.body.style.cursor = 'auto'}
       >

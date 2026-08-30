@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAppStore } from '../../../stores/useAppStore';
+import { Hotspot } from '../../../components/3d/Hotspot';
 
 export const ModernLiving: React.FC = () => {
   const { setSelectedProduct } = useAppStore();
@@ -12,12 +13,33 @@ export const ModernLiving: React.FC = () => {
         <meshStandardMaterial color="#c4baa8" roughness={0.9} /> {/* Carpet / Rug */}
       </mesh>
 
+      {/* Walls */}
+      <mesh position={[0, 2.5, -5]} receiveShadow>
+        <boxGeometry args={[10, 5, 0.2]} />
+        <meshStandardMaterial color="#fdfbf7" roughness={0.9} />
+      </mesh>
+      <mesh position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[10, 5, 0.2]} />
+        <meshStandardMaterial color="#050a15" roughness={0.7} /> {/* Accent Wall */}
+      </mesh>
+      
+      {/* Hotspot pointing to the product */}
+      <Hotspot 
+        position={[0, 1.8, -2]} 
+        productId="sofa-modern-01" 
+        labelAr="طقم انتريه مودرن" 
+        labelEn="Modern Sofa Set" 
+      />
+
       {/* Placeholder Sofa - Modern Curved */}
       <mesh 
         position={[0, 0.4, -2]} 
         castShadow 
         receiveShadow
-        onClick={() => setSelectedProduct('sofa-modern-01')}
+        onClick={(e) => {
+          e.stopPropagation();
+          setSelectedProduct('sofa-modern-01');
+        }}
         onPointerOver={() => document.body.style.cursor = 'pointer'}
         onPointerOut={() => document.body.style.cursor = 'auto'}
       >
