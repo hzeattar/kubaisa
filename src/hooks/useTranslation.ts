@@ -1,16 +1,14 @@
 import { useAppStore } from '../stores/useAppStore';
-import { translations, TranslationKey } from '../i18n/translations';
+import { translations } from '../i18n/translations';
+
+type TranslationSection = keyof typeof translations.ar;
 
 export const useTranslation = () => {
-  const language = useAppStore((state) => state.language);
-  
-  const t = (section: keyof typeof translations.ar, key: string): string => {
-    try {
-      // @ts-ignore
-      return translations[language][section][key] || key;
-    } catch (e) {
-      return key;
-    }
+  const language = useAppStore(state => state.language);
+
+  const t = (section: TranslationSection, key: string): string => {
+    const values = translations[language][section] as Record<string, string>;
+    return values[key] ?? key;
   };
 
   return { t, language };
