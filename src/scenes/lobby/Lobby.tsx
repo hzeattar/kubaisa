@@ -105,11 +105,11 @@ export const Lobby: React.FC = () => {
         </mesh>
         <mesh position={[0, -1, 0]}>
           <cylinderGeometry args={[2, 1, 0.5, 32]} />
-          <meshStandardMaterial color="#fff" transparent opacity={0.6} transmission={0.9} roughness={0.1} />
+          <meshPhysicalMaterial color="#fff" transparent opacity={0.6} transmission={0.9} roughness={0.1} />
         </mesh>
         <mesh position={[0, -1.6, 0]}>
           <cylinderGeometry args={[1, 0.2, 0.5, 32]} />
-          <meshStandardMaterial color="#fff" transparent opacity={0.6} transmission={0.9} roughness={0.1} />
+          <meshPhysicalMaterial color="#fff" transparent opacity={0.6} transmission={0.9} roughness={0.1} />
         </mesh>
         <pointLight position={[0, -1.2, 0]} intensity={2} distance={15} color="#ffe5b4" castShadow />
       </group>
