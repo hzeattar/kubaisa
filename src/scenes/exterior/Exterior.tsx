@@ -1,11 +1,19 @@
-import React from 'react';
-import { Text, Environment } from '@react-three/drei';
+import React, { useEffect } from 'react';
+import { Environment, useTexture } from '@react-three/drei';
+import * as THREE from 'three';
 import { Pillar, Window } from '../../components/3d/Architectural';
 import { useSharedTextures } from '../../components/3d/Materials';
 import { ArrivalLandscape } from './ArrivalLandscape';
 
 export const Exterior: React.FC = () => {
   const { plaster, marble, metal } = useSharedTextures();
+  const logoTexture = useTexture('/brand/qubaisa-logo.webp');
+
+  useEffect(() => {
+    logoTexture.colorSpace = THREE.SRGBColorSpace;
+    logoTexture.anisotropy = 4;
+    logoTexture.needsUpdate = true;
+  }, [logoTexture]);
 
   return (
     <group>
@@ -93,38 +101,29 @@ export const Exterior: React.FC = () => {
             <meshStandardMaterial {...plaster} color="#f0ede6" />
           </mesh>
 
+          {/* Real supplied Qubaisa brand artwork on a physically-mounted, backlit cladding sign. */}
           <group position={[0, 12, 0.6]}>
             <mesh castShadow receiveShadow>
-              <boxGeometry args={[12, 2.8, 0.3]} />
-              <meshStandardMaterial {...marble} color="#050c1c" roughness={0.2} metalness={0.4} />
+              <boxGeometry args={[7.1, 3.25, 0.34]} />
+              <meshStandardMaterial {...metal} color="#b99249" roughness={0.28} metalness={0.92} />
             </mesh>
-            <mesh position={[0, 0, 0.16]} castShadow receiveShadow>
-              <boxGeometry args={[11.6, 2.4, 0.1]} />
-              <meshStandardMaterial color="#02050b" roughness={0.3} metalness={0.6} />
+            <mesh position={[0, 0, 0.19]} castShadow receiveShadow>
+              <boxGeometry args={[6.72, 2.87, 0.12]} />
+              <meshStandardMaterial color="#050c1c" roughness={0.3} metalness={0.45} />
             </mesh>
-
-            <Text
-              position={[0, 0.4, 0.25]}
-              fontSize={1.4}
-              font="https://fonts.gstatic.com/s/cairo/v31/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hAc5W1Q.ttf"
-              anchorX="center"
-              anchorY="middle"
-            >
-              قبيصة للأثاث
-              <meshStandardMaterial color="#e6c27a" roughness={0.2} metalness={1} emissive="#e6c27a" emissiveIntensity={0.15} />
-            </Text>
-
-            <Text
-              position={[0, -0.6, 0.25]}
-              fontSize={0.45}
-              letterSpacing={0.1}
-              font="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDQ.ttf"
-              anchorX="center"
-              anchorY="middle"
-            >
-              QUBAISA FURNITURE
-              <meshStandardMaterial color="#e6c27a" roughness={0.2} metalness={1} />
-            </Text>
+            <mesh position={[0, 0, 0.27]}>
+              <planeGeometry args={[2.66, 2.66]} />
+              <meshStandardMaterial
+                map={logoTexture}
+                emissive="#c79b45"
+                emissiveMap={logoTexture}
+                emissiveIntensity={0.14}
+                roughness={0.38}
+                metalness={0.1}
+                toneMapped
+              />
+            </mesh>
+            <pointLight position={[0, 0, 0.45]} color="#d8ad5c" intensity={0.18} distance={4.8} />
           </group>
         </group>
 
