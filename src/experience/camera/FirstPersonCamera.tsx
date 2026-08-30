@@ -5,93 +5,112 @@ import * as THREE from 'three';
 import { useAppStore } from '../../stores/useAppStore';
 
 const keys = {
-  KeyW: false, KeyA: false, KeyS: false, KeyD: false,
-  ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false,
+  KeyW: false,
+  KeyA: false,
+  KeyS: false,
+  KeyD: false,
+  ArrowUp: false,
+  ArrowLeft: false,
+  ArrowDown: false,
+  ArrowRight: false,
 };
 
 export const mobileInput = { moveX: 0, moveY: 0, lookX: 0, lookY: 0 };
 
-// Improved bounding box check for X/Z (Simplified BVH)
-const checkCollision = (position: THREE.Vector3) => {
-  const x = position.x;
-  const z = position.z;
+type Rect = { minX: number; maxX: number; minZ: number; maxZ: number };
 
-  // Exterior bounds (driveway)
-  if (z > -12) {
-    if (x < -25 || x > 25) return true;
-    if (z > 20) return true;
-  }
-  
-  // Lobby bounds
-  if (z <= -12 && z > -40) {
-    // Inside Lobby area
-    if (x >= -14 && x <= 14) {
-      if (z < -39.5) return true; // Back wall of lobby
-    }
-    // Inside Modern
-    else if (x < -14 && x > -34) {
-      if (z < -38 || z > -14) return true;
-    }
-    // Inside NeoClassic
-    else if (x > 14 && x < 34) {
-      if (z < -38 || z > -14) return true;
-    }
-    else {
-      return true; // Solid walls
-    }
-  }
+const WALKABLE_REGIONS: Rect[] = [
+  // Arrival court / exterior.
+  { minX: -25, maxX: 25, minZ: -12.8, maxZ: 20 },
+  // Lobby.
+  { minX: -14, maxX: 14, minZ: -39, maxZ: -0.7 },
+  // Main entrance opening.
+  { minX: -5.8, maxX: 5.8, minZ: -14, maxZ: 0.2 },
+  // Modern showroom and its portal.
+  { minX: -34.2, maxX: -15.8, minZ: -33.2, maxZ: -6.8 },
+  { minX: -16.2, maxX: -13.8, minZ: -23.4, maxZ: -16.6 },
+  // Neo-classical showroom and its portal.
+  { minX: 15.8, maxX: 34.2, minZ: -33.2, maxZ: -6.8 },
+  { minX: 13.8, maxX: 16.2, minZ: -23.4, maxZ: -16.6 },
+];
 
-  if (z <= -40) return true;
-  return false;
+const STATIC_OBSTACLES: Rect[] = [
+  // Lobby front wall segments, leaving the 12m central doorway clear.
+  { minX: -15, maxX: -6, minZ: -1.15, maxZ: 0.15 },
+  { minX: 6, maxX: 15, minZ: -1.15, maxZ: 0.15 },
+  // Reception desk.
+  { minX: -3.5, maxX: 3.5, minZ: -21.8, maxZ: -18.2 },
+  // Grand staircase is visual-only until a real upper floor exists.
+  { minX: -7.2, maxX: 7.2, minZ: -36.7, maxZ: -31.0 },
+  // Lobby pillars.
+  { minX: -9, maxX: -7, minZ: -16, maxZ: -14 },
+  { minX: 7, maxX: 9, minZ: -16, maxZ: -14 },
+  { minX: -9, maxX: -7, minZ: -29, maxZ: -27 },
+  { minX: 7, maxX: 9, minZ: -29, maxZ: -27 },
+  // Hero furniture collision proxies.
+  { minX: -30.5, maxX: -19.5, minZ: -27.5, maxZ: -19.0 },
+  { minX: 19.5, maxX: 30.5, minZ: -27.5, maxZ: -18.0 },
+];
+
+const PLAYER_RADIUS = 0.42;
+
+const pointInRect = (x: number, z: number, rect: Rect, padding = 0) =>
+  x >= rect.minX - padding &&
+  x <= rect.maxX + padding &&
+  z >= rect.minZ - padding &&
+  z <= rect.maxZ + padding;
+
+const isWalkable = (x: number, z: number) => {
+  const inNavigableArea = WALKABLE_REGIONS.some(rect => pointInRect(x, z, rect));
+  if (!inNavigableArea) return false;
+
+  return !STATIC_OBSTACLES.some(rect => pointInRect(x, z, rect, PLAYER_RADIUS));
 };
 
 const getZone = (x: number, z: number): 'exterior' | 'lobby' | 'living-modern' | 'living-neoclassic' => {
-  if (z > -12) return 'exterior';
-  if (x >= -13 && x <= 13) return 'lobby';
-  if (x < -13) return 'living-modern';
-  if (x > 13) return 'living-neoclassic';
+  if (x < -14.5 && z < -6) return 'living-modern';
+  if (x > 14.5 && z < -6) return 'living-neoclassic';
+  if (z < -0.7) return 'lobby';
   return 'exterior';
 };
 
 export const FirstPersonCamera: React.FC = () => {
-  const { camera, gl, scene } = useThree();
-  const velocity = useRef(new THREE.Vector3());
-  const direction = useRef(new THREE.Vector3());
+  const { camera, gl } = useThree();
+  const velocity = useRef(new THREE.Vector2());
+  const direction = useRef(new THREE.Vector2());
   const [isDesktop, setIsDesktop] = useState(true);
-  
+
   const teleportTarget = useAppStore(state => state.teleportTarget);
   const setTeleportTarget = useAppStore(state => state.setTeleportTarget);
   const setActiveZone = useAppStore(state => state.setActiveZone);
-  const activeZone = useAppStore(state => state.activeZone);
   const mode = useAppStore(state => state.mode);
   const selectedProduct = useAppStore(state => state.selectedProduct);
   const showFloorSelector = useAppStore(state => state.showFloorSelector);
-
-  // Raycaster for floor height detection
-  const raycaster = useRef(new THREE.Raycaster());
+  const showIntro = useAppStore(state => state.showIntro);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newZone = getZone(camera.position.x, camera.position.z);
-      if (newZone !== activeZone) setActiveZone(newZone);
-    }, 500);
-    return () => clearInterval(interval);
-  }, [camera, activeZone, setActiveZone]);
+    if (!teleportTarget) return;
+    camera.position.set(teleportTarget[0], teleportTarget[1], teleportTarget[2]);
+    velocity.current.set(0, 0);
+    setActiveZone(getZone(teleportTarget[0], teleportTarget[2]));
+    setTeleportTarget(null);
+  }, [teleportTarget, camera, setActiveZone, setTeleportTarget]);
 
   useEffect(() => {
-    if (teleportTarget) {
-      camera.position.set(teleportTarget[0], teleportTarget[1], teleportTarget[2]);
-      setTeleportTarget(null);
-    }
-  }, [teleportTarget, camera, setTeleportTarget]);
-
-  useEffect(() => {
-    const checkMobile = () => setIsDesktop(!('ontouchstart' in window) && window.innerWidth > 768);
+    const checkMobile = () => setIsDesktop(!window.matchMedia('(pointer: coarse)').matches && window.innerWidth > 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    const handleKeyDown = (e: KeyboardEvent) => { if (keys.hasOwnProperty(e.code)) (keys as any)[e.code] = true; };
-    const handleKeyUp = (e: KeyboardEvent) => { if (keys.hasOwnProperty(e.code)) (keys as any)[e.code] = false; };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (Object.prototype.hasOwnProperty.call(keys, event.code)) {
+        keys[event.code as keyof typeof keys] = true;
+      }
+    };
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (Object.prototype.hasOwnProperty.call(keys, event.code)) {
+        keys[event.code as keyof typeof keys] = false;
+      }
+    };
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
@@ -103,116 +122,109 @@ export const FirstPersonCamera: React.FC = () => {
     };
   }, []);
 
-  // Mobile touch look
   useEffect(() => {
-    if (isDesktop || mode === 'guided-tour' || selectedProduct || showFloorSelector) return;
-    
-    let touchStartX = 0;
-    let touchStartY = 0;
-    const euler = new THREE.Euler(0, 0, 0, 'YXZ');
-    euler.setFromQuaternion(camera.quaternion);
-
-    const handleTouchStart = (e: TouchEvent) => {
-      const touch = Array.from(e.touches).find(t => t.clientX > window.innerWidth / 2);
-      if (touch) {
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      const touch = Array.from(e.touches).find(t => t.clientX > window.innerWidth / 2);
-      if (!touch || touchStartX === 0) return;
-
-      const deltaX = touch.clientX - touchStartX;
-      const deltaY = touch.clientY - touchStartY;
-      
-      const lookSpeed = 0.005;
-      euler.y -= deltaX * lookSpeed;
-      euler.x -= deltaY * lookSpeed;
-      
-      euler.x = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, euler.x));
-      
-      camera.quaternion.setFromEuler(euler);
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-    };
-
-    const handleTouchEnd = () => { touchStartX = 0; touchStartY = 0; };
+    if (isDesktop || mode === 'guided-tour' || selectedProduct || showFloorSelector || showIntro) return;
 
     const canvas = gl.domElement;
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
-    canvas.addEventListener('touchend', handleTouchEnd);
-    canvas.addEventListener('touchcancel', handleTouchEnd);
+    const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+    let lookPointerId: number | null = null;
+    let previousX = 0;
+    let previousY = 0;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.pointerType !== 'touch' || event.clientX <= window.innerWidth / 2 || lookPointerId !== null) return;
+      lookPointerId = event.pointerId;
+      previousX = event.clientX;
+      previousY = event.clientY;
+      canvas.setPointerCapture?.(event.pointerId);
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerId !== lookPointerId) return;
+
+      euler.setFromQuaternion(camera.quaternion);
+      const deltaX = event.clientX - previousX;
+      const deltaY = event.clientY - previousY;
+      const lookSpeed = 0.0045;
+
+      euler.y -= deltaX * lookSpeed;
+      euler.x -= deltaY * lookSpeed;
+      euler.x = Math.max(-1.35, Math.min(1.35, euler.x));
+      camera.quaternion.setFromEuler(euler);
+
+      previousX = event.clientX;
+      previousY = event.clientY;
+    };
+
+    const releasePointer = (event: PointerEvent) => {
+      if (event.pointerId !== lookPointerId) return;
+      if (canvas.hasPointerCapture?.(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      lookPointerId = null;
+    };
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', releasePointer);
+    canvas.addEventListener('pointercancel', releasePointer);
 
     return () => {
-      canvas.removeEventListener('touchstart', handleTouchStart);
-      canvas.removeEventListener('touchmove', handleTouchMove);
-      canvas.removeEventListener('touchend', handleTouchEnd);
-      canvas.removeEventListener('touchcancel', handleTouchEnd);
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerup', releasePointer);
+      canvas.removeEventListener('pointercancel', releasePointer);
     };
-  }, [isDesktop, camera, gl, mode, selectedProduct, showFloorSelector]);
+  }, [isDesktop, camera, gl, mode, selectedProduct, showFloorSelector, showIntro]);
 
-  useFrame((state, delta) => {
-    if (mode === 'guided-tour') return;
-    if (selectedProduct || showFloorSelector) return;
+  useFrame((_, delta) => {
+    if (showIntro || mode === 'guided-tour' || selectedProduct || showFloorSelector) return;
 
-    const speed = 15.0;
-    
-    velocity.current.x -= velocity.current.x * 10.0 * delta;
-    velocity.current.z -= velocity.current.z * 10.0 * delta;
+    const dt = Math.min(delta, 0.05);
+    const speed = 4.4;
+    const damping = Math.exp(-9 * dt);
 
-    direction.current.z = Number(keys.KeyW || keys.ArrowUp) - Number(keys.KeyS || keys.ArrowDown) + mobileInput.moveY;
-    direction.current.x = Number(keys.KeyD || keys.ArrowRight) - Number(keys.KeyA || keys.ArrowLeft) + mobileInput.moveX;
-    
+    velocity.current.multiplyScalar(damping);
+
+    direction.current.set(
+      Number(keys.KeyD || keys.ArrowRight) - Number(keys.KeyA || keys.ArrowLeft) + mobileInput.moveX,
+      Number(keys.KeyW || keys.ArrowUp) - Number(keys.KeyS || keys.ArrowDown) - mobileInput.moveY,
+    );
+
     if (direction.current.lengthSq() > 1) direction.current.normalize();
 
-    if (keys.KeyW || keys.ArrowUp || keys.KeyS || keys.ArrowDown || mobileInput.moveY !== 0) {
-      velocity.current.z -= direction.current.z * speed * delta;
-    }
-    if (keys.KeyA || keys.ArrowLeft || keys.KeyD || keys.ArrowRight || mobileInput.moveX !== 0) {
-      velocity.current.x -= direction.current.x * speed * delta;
+    velocity.current.x += direction.current.x * speed * dt;
+    velocity.current.y += direction.current.y * speed * dt;
+
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+    forward.y = 0;
+    forward.normalize();
+
+    const right = new THREE.Vector3().crossVectors(forward, camera.up).normalize();
+    const move = new THREE.Vector3()
+      .addScaledVector(right, velocity.current.x)
+      .addScaledVector(forward, velocity.current.y);
+
+    const nextX = camera.position.x + move.x;
+    if (isWalkable(nextX, camera.position.z)) {
+      camera.position.x = nextX;
+    } else {
+      velocity.current.x *= 0.25;
     }
 
-    const prevPosition = camera.position.clone();
-
-    camera.translateX(-velocity.current.x);
-    camera.translateZ(velocity.current.z);
-    
-    if (checkCollision(camera.position)) {
-      camera.position.x = prevPosition.x;
-      camera.position.z = prevPosition.z;
-      velocity.current.set(0,0,0);
-    }
-    
-    // Y-Axis Floor Following (Allows climbing stairs)
-    // We cast a ray from 10 meters above current position downwards
-    const rayOrigin = new THREE.Vector3(camera.position.x, 10, camera.position.z);
-    raycaster.current.set(rayOrigin, new THREE.Vector3(0, -1, 0));
-    
-    // Intersect only with elements that should act as ground. 
-    // In our simplified scene, we just intersect all meshes.
-    const intersects = raycaster.current.intersectObjects(scene.children, true);
-    let floorHeight = 0;
-    
-    if (intersects.length > 0) {
-      // Find the highest point that is below the camera's general area
-      // We assume the first hit from top is the floor/roof. 
-      // To prevent walking on roofs, we only accept floor if it's within a step height of current
-      for(let i=0; i<intersects.length; i++) {
-         if (intersects[i].point.y < prevPosition.y + 1.0) {
-           floorHeight = intersects[i].point.y;
-           break;
-         }
-      }
+    const nextZ = camera.position.z + move.z;
+    if (isWalkable(camera.position.x, nextZ)) {
+      camera.position.z = nextZ;
+    } else {
+      velocity.current.y *= 0.25;
     }
 
-    // Smoothly interpolate Y to avoid sudden snapping on stairs
-    const targetY = floorHeight + 1.7; // 1.7m eye level
-    camera.position.y += (targetY - camera.position.y) * 10 * delta;
+    // The current vertical slice is a single navigable level. The grand staircase is blocked
+    // until a real upper-floor scene exists, avoiding the previous "walk on furniture/roof" raycast bug.
+    camera.position.y += (1.7 - camera.position.y) * Math.min(1, 10 * dt);
+
+    setActiveZone(getZone(camera.position.x, camera.position.z));
   });
 
-  const shouldLock = isDesktop && mode === 'explore' && !selectedProduct && !showFloorSelector;
-  return shouldLock ? <PointerLockControls selector="#root" /> : null;
+  const shouldLock = isDesktop && !showIntro && mode === 'explore' && !selectedProduct && !showFloorSelector;
+  return shouldLock ? <PointerLockControls /> : null;
 };
