@@ -1,6 +1,20 @@
-import React, { useMemo } from 'react';
+import { useEffect } from 'react';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+
+type TextureSet = Partial<Record<'map' | 'normalMap' | 'roughnessMap', THREE.Texture>>;
+
+const configureTextureSet = (textures: TextureSet, repeatX: number, repeatY: number) => {
+  Object.entries(textures).forEach(([key, texture]) => {
+    if (!texture) return;
+
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(repeatX, repeatY);
+    texture.colorSpace = key === 'map' ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    texture.needsUpdate = true;
+  });
+};
 
 export const useSharedTextures = () => {
   const marble = useTexture({
@@ -27,24 +41,11 @@ export const useSharedTextures = () => {
     roughnessMap: '/textures/metal/Metal034_1K-JPG_Roughness.jpg',
   });
 
-  useMemo(() => {
-    const config = (texGroup, repeatX, repeatY) => {
-      if (texGroup.map) {
-        texGroup.map.colorSpace = THREE.SRGBColorSpace;
-      }
-      Object.entries(texGroup).forEach(([key, tex]) => {
-        if (tex) {
-          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-          tex.repeat.set(repeatX, repeatY);
-          if (key !== 'map') tex.colorSpace = THREE.NoColorSpace; // Linear for data textures
-        }
-      });
-    };
-
-    config(marble, 4, 4);
-    config(plaster, 8, 8);
-    config(wood, 3, 3);
-    config(metal, 2, 2);
+  useEffect(() => {
+    configureTextureSet(marble, 4, 4);
+    configureTextureSet(plaster, 8, 8);
+    configureTextureSet(wood, 3, 3);
+    configureTextureSet(metal, 2, 2);
   }, [marble, plaster, wood, metal]);
 
   return { marble, plaster, wood, metal };
