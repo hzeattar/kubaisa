@@ -1,0 +1,2 @@
+# QA
+Visual inspection.

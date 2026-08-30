@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+
+@theme {
+  --color-qubaisa-navy: #050a15;
+  --color-qubaisa-navy-light: #0d1527;
+  --color-qubaisa-gold: #d4af37;
+  --color-qubaisa-gold-light: #f3e5ab;
+  --color-qubaisa-ivory: #fffff0;
+  --color-qubaisa-cream: #fdfbf7;
+  
+  --font-sans: 'Cairo', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-qubaisa-navy);
+  color: var(--color-qubaisa-cream);
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Canvas covers everything */
+  user-select: none;
+}
+
+/* Custom scrollbar for UI overlays */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(5, 10, 21, 0.5); 
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.5); 
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.8); 
+}

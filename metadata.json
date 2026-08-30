@@ -1,0 +1,6 @@
+{
+  "name": "Qubaisa Virtual Palace",
+  "description": "قصر قبيصة الافتراضي - جولة افتراضية فاخرة للأثاث | Luxury Furniture Virtual Showroom",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

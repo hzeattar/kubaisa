@@ -1,11 +1,26 @@
-<div align="center">
+# قصر قبيصة الافتراضي (Qubaisa Virtual Palace)
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A WebGL-powered interactive luxury furniture showroom for Qubaisa Furniture.
 
-  <h1>Built with AI Studio</h2>
+## Features
+- Interactive 3D Showroom (Exterior, Lobby, Modern Living, NeoClassic Living)
+- Mobile-first approach (touch controls, joystick, responsive UI)
+- Arabic (RTL) First, English supported
+- Qubaisa Branding Integration
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Tech Stack
+- React 18, Vite, TypeScript
+- Tailwind CSS
+- Three.js, React Three Fiber, React Three Drei
+- Zustand for state management
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Running Locally
+1. `npm install`
+2. `npm run dev`
 
-</div>
+## Deployment (Railway)
+This project is connected to Railway and uses standard Vite build process.
+- Build command: `npm run build`
+- Start command: Depends on server setup. (Currently uses `vite preview` or static serving).
+
+For more detailed technical documentation, please see the `/docs` directory.
