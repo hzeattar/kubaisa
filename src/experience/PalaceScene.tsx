@@ -6,6 +6,7 @@ import { Lobby } from '../scenes/lobby/Lobby';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
 import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
 import { GuidedTour } from './camera/GuidedTour';
+import { IntroSequence } from './camera/IntroSequence';
 import { useAppStore } from '../stores/useAppStore';
 
 export const PalaceScene: React.FC = () => {
@@ -14,6 +15,7 @@ export const PalaceScene: React.FC = () => {
   return (
     <>
       <FirstPersonCamera />
+      <IntroSequence />
       <GuidedTour />
       
       {/* Lighting & Environment - Golden Hour */}

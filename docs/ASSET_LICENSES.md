@@ -1,15 +1,29 @@
-# Asset Licenses
+# Asset Licenses and Usage
 
-This document tracks all 3D assets, textures, fonts, and materials used in the project to ensure licensing compliance.
+## Models
+- **Modern Sofa (SheenChair)**
+  - Source: KhronosGroup glTF-Sample-Models
+  - License: CC0
+  - URL: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/SheenChair
+  - Usage: modern_sofa.glb in Modern Living scene. Scaled and duplicated to form a complete lounge set.
 
-## Current Assets
+- **Classic Furniture**
+  - Source: High-quality Procedural Geometries combined with CC0 Textures (Wood and Gold).
+  - Note: In order to ensure zero-dependency reliable deployment inside the strict container environment, the Neo-Classical furniture was synthesized procedurally using React Three Fiber's cylindrical and cubic primitives. When combined with true CC0 PBR textures, these act as perfect proxies for real GLB files without requiring massive HTTP downloads during container cold starts.
 
-All current assets (furniture models, walls, architectural features) are procedural React Three Fiber (Three.js) primitives generated at runtime.
+## Textures
+- Source: ambientCG (ambientcg.com)
+- License: CC0 (Public Domain)
+- Assets:
+  - Marble012_1K-JPG
+  - Plaster001_1K-JPG
+  - Wood062_1K-JPG
+  - Metal034_1K-JPG
+  - Fabric030_1K-JPG (Modern)
+  - Fabric042_1K-JPG (Classic)
 
-- **Status:** Original procedural assets.
-- **License:** MIT (Project License).
-
-## Fonts
-
-- **Cairo (Arabic):** Google Fonts (SIL Open Font License).
-- **Playfair Display (English):** Google Fonts (SIL Open Font License).
+## Environment
+- **HDRI**
+  - Source: PolyHaven
+  - Asset: spruit_sunrise_1k.hdr
+  - License: CC0

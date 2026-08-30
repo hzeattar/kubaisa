@@ -1,116 +1,131 @@
 import React from 'react';
+import { useSharedTextures } from '../../components/3d/Materials';
 import { Pillar } from '../../components/3d/Architectural';
-import { Hotspot } from '../../components/3d/Hotspot';
 
 export const Lobby: React.FC = () => {
+  const { marble, plaster, metal, wood } = useSharedTextures();
+
   return (
-    <group position={[0, 0, -20]}>
-      {/* Grand Lobby Floor */}
+    <group>
+      {/* Floor - Luxury Marble */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[28, 28]} />
-        <meshStandardMaterial color="#fdfbf7" roughness={0.1} metalness={0.1} /> {/* Premium Marble */}
+        <planeGeometry args={[30, 40]} />
+        <meshStandardMaterial {...marble} color="#e5e0d8" roughness={0.1} metalness={0.1} />
       </mesh>
 
-      {/* Ceiling */}
-      <mesh position={[0, 8, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[28, 28]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      {/* High Ceiling */}
+      <mesh position={[0, 9, -20]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[30, 40]} />
+        <meshStandardMaterial {...plaster} color="#fdfbf7" />
       </mesh>
 
-      {/* Back Wall (Elevator / Staircase area) */}
-      <mesh position={[0, 4, -13.5]} receiveShadow>
-        <boxGeometry args={[28, 8, 1]} />
-        <meshStandardMaterial color="#e5e0d8" roughness={0.8} /> 
+      {/* Walls */}
+      {/* Left Wall */}
+      <mesh position={[-15, 4.5, -20]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[40, 9, 1]} />
+        <meshStandardMaterial {...plaster} color="#f5f2eb" />
+      </mesh>
+      {/* Right Wall */}
+      <mesh position={[15, 4.5, -20]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[40, 9, 1]} />
+        <meshStandardMaterial {...plaster} color="#f5f2eb" />
+      </mesh>
+      {/* Front Wall (Entrance) - Interior side */}
+      <mesh position={[0, 4.5, -0.5]} receiveShadow>
+        <boxGeometry args={[30, 9, 1]} />
+        <meshStandardMaterial {...plaster} color="#f5f2eb" />
       </mesh>
       
-      {/* Statement Wall Panel */}
-      <mesh position={[0, 4, -12.9]} receiveShadow>
-        <boxGeometry args={[10, 8, 0.2]} />
-        <meshStandardMaterial color="#050a15" roughness={0.6} /> 
-      </mesh>
-
-      {/* Elevator Doors */}
-      <mesh position={[0, 2, -12.75]} castShadow receiveShadow>
-        <boxGeometry args={[3, 4, 0.1]} />
-        <meshStandardMaterial color="#d4af37" roughness={0.3} metalness={0.9} />
-      </mesh>
-
-      {/* Grand Staircase (Visual) */}
-      <group position={[-8, 0, -10]}>
-        {[0,1,2,3,4,5,6,7,8,9,10].map(i => (
-          <mesh key={i} position={[0, i * 0.3 + 0.15, i * 0.4]} receiveShadow castShadow>
-            <boxGeometry args={[4, 0.3, 0.4]} />
-            <meshStandardMaterial color="#fdfbf7" roughness={0.2} metalness={0.1} />
-          </mesh>
-        ))}
-      </group>
-      <group position={[8, 0, -10]}>
-        {[0,1,2,3,4,5,6,7,8,9,10].map(i => (
-          <mesh key={i} position={[0, i * 0.3 + 0.15, i * 0.4]} receiveShadow castShadow>
-            <boxGeometry args={[4, 0.3, 0.4]} />
-            <meshStandardMaterial color="#fdfbf7" roughness={0.2} metalness={0.1} />
-          </mesh>
-        ))}
+      {/* Main Feature Wall (Back) */}
+      <group position={[0, 0, -39.5]}>
+        <mesh position={[0, 4.5, 0]} receiveShadow>
+          <boxGeometry args={[30, 9, 1]} />
+          <meshStandardMaterial {...plaster} color="#11151c" /> {/* Dark contrast wall */}
+        </mesh>
+        
+        {/* Elevator / Central Feature */}
+        <mesh position={[0, 4.5, 0.6]} castShadow receiveShadow>
+          <boxGeometry args={[6, 9, 0.2]} />
+          <meshStandardMaterial {...marble} color="#d4ccb8" roughness={0.2} />
+        </mesh>
+        
+        {/* Elevator Doors */}
+        <mesh position={[0, 2.5, 0.72]} castShadow>
+          <boxGeometry args={[3, 5, 0.1]} />
+          <meshStandardMaterial {...metal} color="#cba135" roughness={0.3} metalness={0.9} />
+        </mesh>
+        <mesh position={[0, 2.5, 0.73]}>
+          <boxGeometry args={[0.02, 5, 0.12]} />
+          <meshStandardMaterial color="#111" />
+        </mesh>
       </group>
 
-      {/* Left Wall (Separating from Modern) */}
-      <mesh position={[-13.5, 4, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
-        <boxGeometry args={[26, 8, 1]} />
-        <meshStandardMaterial color="#e5e0d8" roughness={0.8} /> 
-      </mesh>
-      
-      {/* Right Wall (Separating from NeoClassic) */}
-      <mesh position={[13.5, 4, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
-        <boxGeometry args={[26, 8, 1]} />
-        <meshStandardMaterial color="#e5e0d8" roughness={0.8} /> 
-      </mesh>
+      {/* Grand Staircase (Curved appearance using steps) */}
+      <group position={[0, 0, -36]}>
+        {Array.from({ length: 15 }).map((_, i) => (
+          <mesh key={`stair-${i}`} position={[0, i * 0.2 + 0.1, i * 0.3]} castShadow receiveShadow>
+            <boxGeometry args={[10 + (15-i)*0.2, 0.2, 0.4]} />
+            <meshStandardMaterial {...marble} color="#fff8ee" roughness={0.2} />
+          </mesh>
+        ))}
+        {/* Golden Handrails */}
+        <mesh position={[-6, 2, 2.5]} rotation={[Math.PI/6, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, 10, 8]} />
+          <meshStandardMaterial {...metal} color="#cba135" roughness={0.3} metalness={0.9} />
+        </mesh>
+        <mesh position={[6, 2, 2.5]} rotation={[Math.PI/6, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, 10, 8]} />
+          <meshStandardMaterial {...metal} color="#cba135" roughness={0.3} metalness={0.9} />
+        </mesh>
+      </group>
 
-      {/* Front Wall (Entrance with wide opening) */}
-      <mesh position={[-9.5, 4, 13.5]} receiveShadow>
-        <boxGeometry args={[9, 8, 1]} />
-        <meshStandardMaterial color="#e5e0d8" roughness={0.8} /> 
-      </mesh>
-      <mesh position={[9.5, 4, 13.5]} receiveShadow>
-        <boxGeometry args={[9, 8, 1]} />
-        <meshStandardMaterial color="#e5e0d8" roughness={0.8} /> 
-      </mesh>
-      <mesh position={[0, 6.5, 13.5]} receiveShadow>
-        <boxGeometry args={[10, 3, 1]} />
-        <meshStandardMaterial color="#e5e0d8" roughness={0.8} /> 
-      </mesh>
+      {/* Interior Pillars */}
+      <Pillar position={[-8, 4.5, -15]} height={9} radius={0.5} />
+      <Pillar position={[8, 4.5, -15]} height={9} radius={0.5} />
+      <Pillar position={[-8, 4.5, -28]} height={9} radius={0.5} />
+      <Pillar position={[8, 4.5, -28]} height={9} radius={0.5} />
 
-      {/* Lobby Pillars */}
-      <Pillar position={[-5, 4, 13]} height={8} radius={0.4} />
-      <Pillar position={[5, 4, 13]} height={8} radius={0.4} />
-      <Pillar position={[-5, 4, -8]} height={8} radius={0.4} />
-      <Pillar position={[5, 4, -8]} height={8} radius={0.4} />
+      {/* Reception / Info Desk */}
+      <group position={[0, 0, -20]}>
+        <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[3, 3, 1.2, 32, 1, false, 0, Math.PI]} />
+          <meshStandardMaterial {...wood} color="#3d2a1d" />
+        </mesh>
+        <mesh position={[0, 1.25, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[3.2, 3.2, 0.1, 32, 1, false, 0, Math.PI]} />
+          <meshStandardMaterial {...marble} color="#ffffff" roughness={0.1} metalness={0.1} />
+        </mesh>
+      </group>
 
-      {/* Reception Desk */}
-      <mesh position={[0, 0.6, -8]} castShadow receiveShadow>
-        <boxGeometry args={[5, 1.2, 1.5]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.6} />
-      </mesh>
-      <mesh position={[0, 1.25, -7.8]} castShadow receiveShadow>
-        <boxGeometry args={[5.2, 0.1, 0.6]} />
-        <meshStandardMaterial color="#d4af37" roughness={0.2} metalness={0.8} />
-      </mesh>
-
-      {/* Grand Chandelier */}
-      <group position={[0, 6, 0]}>
-        <mesh>
-          <cylinderGeometry args={[2, 0.1, 2, 16]} />
-          <meshStandardMaterial color="#d4af37" roughness={0.1} metalness={1} wireframe />
+      {/* Chandelier (Simplified Luxury) */}
+      <group position={[0, 7, -20]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.02, 0.02, 4]} />
+          <meshStandardMaterial {...metal} color="#d4af37" metalness={1} />
         </mesh>
         <mesh position={[0, -1, 0]}>
-          <cylinderGeometry args={[1.5, 0.1, 1.5, 16]} />
-          <meshStandardMaterial color="#d4af37" roughness={0.1} metalness={1} wireframe />
+          <cylinderGeometry args={[2, 1, 0.5, 32]} />
+          <meshStandardMaterial color="#fff" transparent opacity={0.6} transmission={0.9} roughness={0.1} />
         </mesh>
-        <mesh position={[0, -2, 0]}>
-          <sphereGeometry args={[0.8, 16, 16]} />
-          <meshStandardMaterial color="#f3e5ab" emissive="#f3e5ab" emissiveIntensity={2} />
-          <pointLight intensity={2.5} color="#f3e5ab" distance={20} />
+        <mesh position={[0, -1.6, 0]}>
+          <cylinderGeometry args={[1, 0.2, 0.5, 32]} />
+          <meshStandardMaterial color="#fff" transparent opacity={0.6} transmission={0.9} roughness={0.1} />
         </mesh>
+        <pointLight position={[0, -1.2, 0]} intensity={2} distance={15} color="#ffe5b4" castShadow />
       </group>
+      
+      {/* Wing Portals (Openings to Modern and Classic) */}
+      {/* Left to Modern */}
+      <mesh position={[-14.5, 3.5, -20]} castShadow receiveShadow>
+        <boxGeometry args={[1.2, 7, 6]} />
+        <meshStandardMaterial {...plaster} color="#f5f2eb" />
+      </mesh>
+      {/* Right to Classic */}
+      <mesh position={[14.5, 3.5, -20]} castShadow receiveShadow>
+        <boxGeometry args={[1.2, 7, 6]} />
+        <meshStandardMaterial {...plaster} color="#f5f2eb" />
+      </mesh>
+
     </group>
   );
 };
