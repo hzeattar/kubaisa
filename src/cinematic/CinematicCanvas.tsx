@@ -265,6 +265,8 @@ export function CinematicCanvas({ department }: { department: Department | null 
       onCreated={({ gl }) => {
         gl.toneMappingExposure = 1.0;
         gl.outputColorSpace = THREE.SRGBColorSpace;
+        gl.shadowMap.type = THREE.PCFSoftShadowMap;
+        gl.shadowMap.autoUpdate = true;
       }}
       fallback={<CinematicStaticFallback />}
     >
