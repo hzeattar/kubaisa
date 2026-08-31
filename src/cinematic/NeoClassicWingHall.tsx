@@ -76,7 +76,6 @@ function NeoSalonHero({ textures }: { textures: ClassicTextures }) {
         <meshStandardMaterial color="#8b7968" roughness={0.95} />
       </RoundedBox>
 
-      {/* Restrained classical wall panelling behind the hero set. */}
       {[-2.45, 0, 2.45].map((x) => (
         <group key={x} position={[x, 3.05, -3.08]}>
           <mesh receiveShadow>
@@ -137,6 +136,33 @@ function NeoSalonHero({ textures }: { textures: ClassicTextures }) {
   );
 }
 
+function OpenSalonPortal({ textures }: { textures: ClassicTextures }) {
+  const { plaster, metal, marble } = textures;
+
+  return (
+    <group position={[7.02, 0, -11.4]} rotation={[0, -Math.PI / 2, 0]}>
+      {[-2.58, 2.58].map((frameX) => (
+        <mesh key={frameX} position={[frameX, 3.15, 0.18]} castShadow receiveShadow>
+          <boxGeometry args={[0.34, 6.25, 0.44]} />
+          <meshStandardMaterial {...plaster} color="#eee3d5" roughness={0.66} />
+        </mesh>
+      ))}
+      <mesh position={[0, 4.82, 0.2]} castShadow>
+        <torusGeometry args={[2.58, 0.16, 10, 48, Math.PI]} />
+        <meshPhysicalMaterial {...marble} color="#e0d3c1" roughness={0.28} clearcoat={0.05} />
+      </mesh>
+      <mesh position={[0, 5.02, 0.3]} castShadow>
+        <torusGeometry args={[2.58, 0.045, 8, 48, Math.PI]} />
+        <meshStandardMaterial {...metal} color={CHAMPAGNE} metalness={0.9} roughness={0.3} emissive="#654a23" emissiveIntensity={0.12} />
+      </mesh>
+      <mesh position={[0, 0.16, 0.19]} receiveShadow>
+        <boxGeometry args={[4.95, 0.13, 0.44]} />
+        <meshPhysicalMaterial {...marble} color="#cbbba7" roughness={0.3} clearcoat={0.05} />
+      </mesh>
+    </group>
+  );
+}
+
 function ClassicPreviewPortal({
   side,
   z,
@@ -152,13 +178,17 @@ function ClassicPreviewPortal({
 
   return (
     <group position={[x, 0, z]} rotation={[0, rotationY, 0]}>
-      <mesh position={[0, 2.55, -0.08]}>
-        <boxGeometry args={[4.8, 4.8, 0.36]} />
-        <meshStandardMaterial color="#17120e" roughness={0.4} />
+      <mesh position={[0, 3.75, -0.22]} receiveShadow>
+        <boxGeometry args={[6.35, 7.45, 0.18]} />
+        <meshStandardMaterial color="#15110e" roughness={0.46} />
       </mesh>
-      <mesh position={[0, 4.8, -0.08]} rotation={[0, 0, 0]}>
+      <mesh position={[0, 2.55, -0.08]}>
+        <boxGeometry args={[4.8, 4.8, 0.12]} />
+        <meshPhysicalMaterial color="#1c1713" roughness={0.25} metalness={0.08} clearcoat={0.12} />
+      </mesh>
+      <mesh position={[0, 4.8, -0.08]}>
         <circleGeometry args={[2.4, 36, 0, Math.PI]} />
-        <meshStandardMaterial color="#17120e" roughness={0.4} side={2} />
+        <meshPhysicalMaterial color="#1c1713" roughness={0.25} metalness={0.08} clearcoat={0.12} side={2} />
       </mesh>
 
       {[-2.58, 2.58].map((frameX) => (
@@ -234,11 +264,8 @@ function NeoClassicHallShell({ textures }: { textures: ClassicTextures }) {
         <meshStandardMaterial {...plaster} color="#eee4d7" roughness={0.78} side={2} />
       </mesh>
 
-      {/* Left wall: one Dining preview opening. */}
       <WallSegment side={-1} z={-7.15} length={26.3} textures={textures} />
       <WallSegment side={-1} z={-40.65} length={26.7} textures={textures} />
-
-      {/* Right wall: Salon hero opening followed by Bedroom preview. */}
       <WallSegment side={1} z={-0.95} length={13.9} textures={textures} />
       <WallSegment side={1} z={-23.7} length={17.6} textures={textures} />
       <WallSegment side={1} z={-46.75} length={14.5} textures={textures} />
@@ -254,14 +281,13 @@ function NeoClassicHallShell({ textures }: { textures: ClassicTextures }) {
         {ceilingStations.map((z) => <Instance key={`light-${z}`} position={[0, 7.84, z]} />)}
       </Instances>
 
-      {/* Ceiling medallions are cheap geometry but make the classic hall read differently from Modern. */}
       {[-8, -26, -44].map((z) => (
-        <group key={`medallion-${z}`} position={[0, 8.0, z]} rotation={[Math.PI / 2, 0, 0]}>
+        <group key={`medallion-${z}`} position={[0, 8.0, z]}>
           <mesh>
             <cylinderGeometry args={[1.15, 1.15, 0.08, 32]} />
-            <meshStandardMaterial {...plaster} color="#eadfD1" roughness={0.68} />
+            <meshStandardMaterial {...plaster} color="#eadfd1" roughness={0.68} />
           </mesh>
-          <mesh position={[0, 0.06, 0]}>
+          <mesh position={[0, -0.06, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[0.78, 0.045, 8, 32]} />
             <meshStandardMaterial {...metal} color={CHAMPAGNE} metalness={0.86} roughness={0.34} />
           </mesh>
@@ -282,6 +308,7 @@ export function NeoClassicWingHall() {
     <group position={[25, 0, -24]}>
       <NeoClassicHallShell textures={textures} />
       <NeoSalonHero textures={textures} />
+      <OpenSalonPortal textures={textures} />
 
       <ClassicPreviewPortal side={-1} z={-23.8} textures={textures} />
       <ClassicPreviewPortal side={1} z={-36.0} textures={textures} />
