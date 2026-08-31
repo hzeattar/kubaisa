@@ -55,8 +55,8 @@ function RoomCamera({ room, viewIndex }: { room: InteractiveRoom; viewIndex: num
       maxDistance={12}
       minPolarAngle={Math.PI * 0.24}
       maxPolarAngle={Math.PI * 0.62}
-      truckSpeed={0.6}
-      dollySpeed={0.35}
+      truckSpeed={0.35}
+      dollySpeed={0.25}
       smoothTime={0.65}
     />
   );
@@ -117,6 +117,7 @@ function RoomScene({ room, language, onOpenProduct }: { room: InteractiveRoom; l
 export function InteractiveRoomExperience({ room, language, onClose }: Props) {
   const [viewIndex, setViewIndex] = useState(0);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const lastWheelAt = useRef(0);
   const views = ROOM_VIEWS[room];
   const roomTitle = room === 'modern'
     ? (language === 'ar' ? 'المعيشة المودرن' : 'Modern Living')
@@ -133,6 +134,32 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
     setSelectedProductId(null);
   }, [room]);
 
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowDown' || event.key === 'PageDown') {
+        event.preventDefault();
+        setViewIndex((current) => Math.min(views.length - 1, current + 1));
+      }
+      if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+        event.preventDefault();
+        setViewIndex((current) => Math.max(0, current - 1));
+      }
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [onClose, views.length]);
+
+  const handleWheel = (event: React.WheelEvent<HTMLElement>) => {
+    if (Math.abs(event.deltaY) < 18 || selectedProductId) return;
+    const now = performance.now();
+    if (now - lastWheelAt.current < 620) return;
+    lastWheelAt.current = now;
+    setViewIndex((current) => event.deltaY > 0
+      ? Math.min(views.length - 1, current + 1)
+      : Math.max(0, current - 1));
+  };
+
   const selectedProduct = selectedProductId ? products[selectedProductId] : null;
   const displayedPrice = useMemo(() => {
     if (!selectedProduct) return '';
@@ -143,17 +170,19 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
   }, [language, selectedProduct]);
 
   return (
-    <section className="interactive-room" aria-label={roomTitle}>
+    <section className="interactive-room" aria-label={roomTitle} onWheel={handleWheel}>
       <div className="interactive-room__topbar">
         <button type="button" className="room-back" onClick={onClose}>
           <span aria-hidden="true">←</span>
-          {language === 'ar' ? 'العودة للقصر' : 'Back to palace'}
+          {language === 'ar' ? 'العودة للهول' : 'Back to hall'}
         </button>
         <div className="room-title">
           <span>{language === 'ar' ? 'قصر قبيصة الافتراضي' : 'Qubaisa Virtual Palace'}</span>
           <strong>{roomTitle}</strong>
         </div>
-        <div className="room-hint">{language === 'ar' ? 'اسحب للنظر حولك' : 'Drag to look around'}</div>
+        <div className="room-hint">
+          {language === 'ar' ? 'مرّر للمشي · اسحب للنظر حولك' : 'Scroll to move · drag to look'}
+        </div>
       </div>
 
       <div className="interactive-room__canvas">
