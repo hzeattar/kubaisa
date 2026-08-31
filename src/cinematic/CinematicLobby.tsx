@@ -1,4 +1,4 @@
-import { Image, RoundedBox } from '@react-three/drei';
+import { Image, Instance, Instances, RoundedBox } from '@react-three/drei';
 import { useArchitecturalTextures } from '../components/3d/Materials';
 
 const gold = '#c7a45b';
@@ -6,11 +6,12 @@ const stone = '#eee7dc';
 
 function LobbyColumn({ x, z }: { x: number; z: number }) {
   const { plaster, marble, metal } = useArchitecturalTextures();
+
   return (
     <group position={[x, 0, z]}>
       <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.72, 0.84, 0.44, 24]} />
-        <meshStandardMaterial {...marble} color="#d8cfc1" roughness={0.42} />
+        <meshPhysicalMaterial {...marble} color="#d8cfc1" roughness={0.36} clearcoat={0.05} />
       </mesh>
       <mesh position={[0, 4.2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.46, 0.54, 7.95, 28]} />
@@ -30,19 +31,19 @@ function LobbyColumn({ x, z }: { x: number; z: number }) {
 
 function StairFlight({ side }: { side: -1 | 1 }) {
   const { marble, metal } = useArchitecturalTextures();
+
   return (
     <group position={[side * 5.3, 0, -27.5]} rotation={[0, side * -0.16, 0]}>
-      {Array.from({ length: 16 }, (_, i) => {
-        const y = 0.12 + i * 0.19;
-        const z = i * -0.36;
-        const width = 5.2 - i * 0.05;
-        return (
-          <mesh key={i} position={[0, y, z]} castShadow receiveShadow>
-            <boxGeometry args={[width, 0.2, 0.74]} />
-            <meshStandardMaterial {...marble} color="#e8e0d5" roughness={0.3} />
-          </mesh>
-        );
-      })}
+      <Instances limit={16} castShadow receiveShadow>
+        <boxGeometry args={[1, 0.2, 0.74]} />
+        <meshPhysicalMaterial {...marble} color="#e8e0d5" roughness={0.26} clearcoat={0.06} />
+        {Array.from({ length: 16 }, (_, i) => {
+          const y = 0.12 + i * 0.19;
+          const z = i * -0.36;
+          const width = 5.2 - i * 0.05;
+          return <Instance key={i} position={[0, y, z]} scale={[width, 1, 1]} />;
+        })}
+      </Instances>
       <mesh position={[side * -2.45, 2.0, -2.8]} rotation={[Math.PI / 2.66, 0, 0]} castShadow>
         <cylinderGeometry args={[0.055, 0.055, 6.9, 14]} />
         <meshStandardMaterial {...metal} color={gold} metalness={0.9} roughness={0.32} />
@@ -53,6 +54,7 @@ function StairFlight({ side }: { side: -1 | 1 }) {
 
 function Chandelier() {
   const { metal } = useArchitecturalTextures();
+
   return (
     <group position={[0, 7.65, -19.5]}>
       <mesh castShadow>
@@ -68,24 +70,25 @@ function Chandelier() {
             metalness={0.92}
             roughness={0.28}
             emissive="#8f6727"
-            emissiveIntensity={0.18}
+            emissiveIntensity={0.32}
           />
         </mesh>
       ))}
-      <pointLight position={[0, -2.0, 0]} intensity={16} distance={18} decay={2} color="#ffd9a0" />
+      <pointLight position={[0, -2.0, 0]} intensity={11} distance={15} decay={2} color="#ffd9a0" />
     </group>
   );
 }
 
 function HeroConsole() {
   const { marble, wood, metal } = useArchitecturalTextures();
+
   return (
     <group position={[0, 0, -18.5]}>
       <RoundedBox args={[6.4, 1.3, 1.2]} radius={0.28} smoothness={5} position={[0, 0.78, 0]} castShadow receiveShadow>
         <meshStandardMaterial {...wood} color="#30251f" roughness={0.48} />
       </RoundedBox>
       <RoundedBox args={[6.7, 0.13, 1.38]} radius={0.18} smoothness={4} position={[0, 1.5, 0]} castShadow receiveShadow>
-        <meshStandardMaterial {...marble} color="#f1e9df" roughness={0.18} />
+        <meshPhysicalMaterial {...marble} color="#f1e9df" roughness={0.18} clearcoat={0.16} clearcoatRoughness={0.28} />
       </RoundedBox>
       <mesh position={[0, 0.2, 0.66]} castShadow>
         <boxGeometry args={[5.4, 0.08, 0.08]} />
@@ -102,7 +105,13 @@ export function CinematicLobby() {
     <group>
       <mesh position={[0, -0.08, -19.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[31, 43]} />
-        <meshStandardMaterial {...marble} color="#d8d0c5" roughness={0.3} />
+        <meshPhysicalMaterial
+          {...marble}
+          color="#d8d0c5"
+          roughness={0.24}
+          clearcoat={0.13}
+          clearcoatRoughness={0.3}
+        />
       </mesh>
 
       <mesh position={[0, -0.015, -16.2]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -126,7 +135,7 @@ export function CinematicLobby() {
           </mesh>
           <mesh position={[side * 15, -0.08, -24.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
             <planeGeometry args={[30, 10]} />
-            <meshStandardMaterial {...marble} color="#d8d0c5" roughness={0.3} />
+            <meshPhysicalMaterial {...marble} color="#d8d0c5" roughness={0.26} clearcoat={0.1} />
           </mesh>
           <mesh position={[side * 15, 9.2, -24.5]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
             <planeGeometry args={[30, 10]} />
@@ -141,38 +150,26 @@ export function CinematicLobby() {
             <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
           </mesh>
           <group position={[side * 22, 0, -29.5]}>
-             <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
-               <boxGeometry args={[3.2, 7, 0.8]} />
-               <meshStandardMaterial color="#1f1a16" roughness={0.8} />
-             </mesh>
-             <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
-               <boxGeometry args={[3.6, 7.4, 0.2]} />
-               <meshStandardMaterial {...marble} color="#e6dfd1" roughness={0.3} />
-             </mesh>
+            <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
+              <boxGeometry args={[3.2, 7, 0.8]} />
+              <meshStandardMaterial color="#1f1a16" roughness={0.8} />
+            </mesh>
+            <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
+              <boxGeometry args={[3.6, 7.4, 0.2]} />
+              <meshPhysicalMaterial {...marble} color="#e6dfd1" roughness={0.26} clearcoat={0.08} />
+            </mesh>
           </group>
           <group position={[side * 27, 0, -29.5]}>
-             <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
-               <boxGeometry args={[3.2, 7, 0.8]} />
-               <meshStandardMaterial color="#1f1a16" roughness={0.8} />
-             </mesh>
-             <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
-               <boxGeometry args={[3.6, 7.4, 0.2]} />
-               <meshStandardMaterial {...marble} color="#e6dfd1" roughness={0.3} />
-             </mesh>
+            <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
+              <boxGeometry args={[3.2, 7, 0.8]} />
+              <meshStandardMaterial color="#1f1a16" roughness={0.8} />
+            </mesh>
+            <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
+              <boxGeometry args={[3.6, 7.4, 0.2]} />
+              <meshPhysicalMaterial {...marble} color="#e6dfd1" roughness={0.26} clearcoat={0.08} />
+            </mesh>
           </group>
-          {[-7, -15].map((z) => (
-            <group key={z} position={[side * -0.4, 0, z]}>
-              <mesh position={[0, 3.9, 0]} castShadow receiveShadow>
-                <boxGeometry args={[0.24, 5.9, 5.4]} />
-                <meshStandardMaterial {...plaster} color="#f5efe7" roughness={0.66} />
-              </mesh>
-              <mesh position={[side * -0.15, 3.9, 0]}>
-                <boxGeometry args={[0.12, 4.7, 4.2]} />
-                <meshStandardMaterial color="#18212a" roughness={0.32} metalness={0.2} />
-              </mesh>
-            </group>
-          ))}
-          {[-31, -39].map((z) => (
+          {[-7, -15, -31, -39].map((z) => (
             <group key={z} position={[side * -0.4, 0, z]}>
               <mesh position={[0, 3.9, 0]} castShadow receiveShadow>
                 <boxGeometry args={[0.24, 5.9, 5.4]} />
@@ -194,7 +191,7 @@ export function CinematicLobby() {
         </mesh>
         <mesh position={[0, 4.6, 0.5]} castShadow receiveShadow>
           <boxGeometry args={[9.6, 8.0, 0.28]} />
-          <meshStandardMaterial {...marble} color="#d8ccbc" roughness={0.3} />
+          <meshPhysicalMaterial {...marble} color="#d8ccbc" roughness={0.25} clearcoat={0.1} />
         </mesh>
         <mesh position={[0, 2.85, 0.68]} castShadow>
           <boxGeometry args={[4.25, 5.7, 0.12]} />
@@ -224,18 +221,10 @@ export function CinematicLobby() {
       <Chandelier />
       <HeroConsole />
 
-      {[-10, -5, 5, 10].map((x) => (
-        <pointLight
-          key={x}
-          position={[x, 6.7, -18]}
-          intensity={9}
-          distance={12}
-          decay={2}
-          color="#ffd8a3"
-        />
-      ))}
-
-      <rectAreaLight width={12} height={2.8} intensity={7} color="#ffe0ad" position={[0, 7.2, -34]} rotation={[0, 0, 0]} />
+      {/* Broad ceiling washes create luxury ambience with far fewer per-pixel lights. */}
+      <rectAreaLight width={8} height={3} intensity={4.8} color="#ffd8a3" position={[-7, 7.1, -18]} rotation={[-Math.PI / 2, 0, 0]} />
+      <rectAreaLight width={8} height={3} intensity={4.8} color="#ffd8a3" position={[7, 7.1, -18]} rotation={[-Math.PI / 2, 0, 0]} />
+      <rectAreaLight width={12} height={2.8} intensity={6} color="#ffe0ad" position={[0, 7.2, -34]} rotation={[0, 0, 0]} />
 
       <mesh position={[0, 9.2, -20]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[30, 40]} />

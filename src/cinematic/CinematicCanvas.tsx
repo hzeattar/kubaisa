@@ -1,5 +1,7 @@
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { PerformanceMonitor } from '@react-three/drei';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import * as THREE from 'three';
 import { cinematicScroll } from './scrollState';
 import { BrandFacadeSign } from './BrandFacadeSign';
@@ -106,10 +108,36 @@ function easeJourney(value: number) {
 
 function getSceneMask(progress: number, department: Department | null) {
   let mask = 0;
-  if (progress < 0.62) mask |= EXTERIOR;
-  if (progress >= 0.26 && progress < (department ? 0.79 : 1.01)) mask |= LOBBY;
-  if (department && progress >= 0.68) mask |= HALL;
+
+  // Keep first paint focused on the palace exterior. The heavier lobby only
+  // mounts shortly before the camera crosses the threshold, reducing startup
+  // texture work while preserving a seamless architectural transition.
+  if (progress < 0.59) mask |= EXTERIOR;
+  if (progress >= 0.39 && progress < (department ? 0.81 : 1.01)) mask |= LOBBY;
+  if (department && progress >= 0.7) mask |= HALL;
+
   return mask || LOBBY;
+}
+
+function LocalPbrEnvironment() {
+  const { gl, scene } = useThree();
+
+  useEffect(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const environment = pmrem.fromScene(room, 0.035).texture;
+
+    scene.environment = environment;
+
+    return () => {
+      if (scene.environment === environment) scene.environment = null;
+      environment.dispose();
+      room.clear();
+      pmrem.dispose();
+    };
+  }, [gl, scene]);
+
+  return null;
 }
 
 function CinematicCamera({ department }: { department: Department | null }) {
@@ -186,11 +214,14 @@ function SceneDirector({ department }: { department: Department | null }) {
   );
 }
 
-function CinematicWorld({ department }: { department: Department | null }) {
+function CinematicWorld({ department, quality }: { department: Department | null; quality: number }) {
+  const shadowSize = quality >= 0.72 ? 1024 : 512;
+
   return (
     <>
       <color attach="background" args={['#07101b']} />
       <fog attach="fog" args={['#07101b', 58, 138]} />
+      <LocalPbrEnvironment />
       <CinematicCamera department={department} />
       <ambientLight intensity={0.2} color="#ffe8cb" />
       <hemisphereLight args={['#fff0d8', '#17110c', 0.44]} />
@@ -200,7 +231,8 @@ function CinematicWorld({ department }: { department: Department | null }) {
         color="#ffe3b0"
         castShadow
         shadow-bias={-0.0004}
-        shadow-mapSize={[1024, 1024]}
+        shadow-mapSize-width={shadowSize}
+        shadow-mapSize-height={shadowSize}
       >
         <orthographicCamera attach="shadow-camera" args={[-35, 35, 35, -35, 0.5, 130]} />
       </directionalLight>
@@ -210,19 +242,40 @@ function CinematicWorld({ department }: { department: Department | null }) {
 }
 
 export function CinematicCanvas({ department }: { department: Department | null }) {
+  const [quality, setQuality] = useState(0.82);
+  const isMobile = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 820px), (pointer: coarse)').matches,
+    [],
+  );
+  const dpr = THREE.MathUtils.lerp(isMobile ? 0.88 : 1.0, isMobile ? 1.22 : 1.55, quality);
+
   return (
     <Canvas
       shadows
-      dpr={[1, 1.45]}
+      dpr={dpr}
+      performance={{ min: 0.5 }}
       camera={{ position: [0, 5.8, 37], fov: 40, near: 0.1, far: 190 }}
-      gl={{ antialias: true, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping }}
+      gl={{
+        antialias: true,
+        alpha: false,
+        stencil: false,
+        powerPreference: 'high-performance',
+        toneMapping: THREE.ACESFilmicToneMapping,
+      }}
       onCreated={({ gl }) => {
         gl.toneMappingExposure = 1.0;
         gl.outputColorSpace = THREE.SRGBColorSpace;
       }}
       fallback={<CinematicStaticFallback />}
     >
-      <CinematicWorld department={department} />
+      <PerformanceMonitor
+        flipflops={3}
+        onIncline={() => setQuality((value) => Math.min(1, value + 0.08))}
+        onDecline={() => setQuality((value) => Math.max(0.45, value - 0.14))}
+        onFallback={() => setQuality(0.5)}
+      >
+        <CinematicWorld department={department} quality={quality} />
+      </PerformanceMonitor>
     </Canvas>
   );
 }
