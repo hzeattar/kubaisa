@@ -75,15 +75,23 @@ export const CinematicExterior: React.FC = () => {
         <planeGeometry args={[130, 95]} />
         <meshStandardMaterial color="#17191c" roughness={0.92} />
       </mesh>
-
       <mesh position={[0, -0.02, -4]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[54, 34]} />
         <meshStandardMaterial {...marble} color="#777064" roughness={0.78} />
       </mesh>
 
       <group position={[0, 0, -14]}>
-        <mesh position={[0, 5.4, -0.25]} castShadow receiveShadow>
-          <boxGeometry args={[18, 10.8, 4.7]} />
+        {/* Central pavilion is segmented around a real entrance void so the scroll camera never crosses a solid wall. */}
+        <mesh position={[-6.45, 5.4, -0.25]} castShadow receiveShadow>
+          <boxGeometry args={[5.1, 10.8, 4.7]} />
+          <meshStandardMaterial {...plaster} color="#eee7dc" roughness={0.66} />
+        </mesh>
+        <mesh position={[6.45, 5.4, -0.25]} castShadow receiveShadow>
+          <boxGeometry args={[5.1, 10.8, 4.7]} />
+          <meshStandardMaterial {...plaster} color="#eee7dc" roughness={0.66} />
+        </mesh>
+        <mesh position={[0, 9.2, -0.25]} castShadow receiveShadow>
+          <boxGeometry args={[7.9, 3.2, 4.7]} />
           <meshStandardMaterial {...plaster} color="#eee7dc" roughness={0.66} />
         </mesh>
         <mesh position={[0, 11.65, -0.2]} castShadow receiveShadow>
@@ -96,17 +104,13 @@ export const CinematicExterior: React.FC = () => {
         </mesh>
 
         <group position={[0, 0, 2.55]}>
-          <mesh position={[0, 3.15, 0]} castShadow receiveShadow>
-            <boxGeometry args={[8.8, 6.3, 0.55]} />
-            <meshStandardMaterial color="#07101a" metalness={0.52} roughness={0.2} />
-          </mesh>
           <mesh position={[-2.12, 3.1, 0.32]} castShadow receiveShadow>
             <boxGeometry args={[4.1, 5.8, 0.1]} />
-            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transmission={0.08} transparent opacity={0.78} />
+            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transmission={0.08} transparent opacity={0.68} />
           </mesh>
           <mesh position={[2.12, 3.1, 0.32]} castShadow receiveShadow>
             <boxGeometry args={[4.1, 5.8, 0.1]} />
-            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transmission={0.08} transparent opacity={0.78} />
+            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transmission={0.08} transparent opacity={0.68} />
           </mesh>
           <mesh position={[0, 6.85, -0.02]} castShadow receiveShadow>
             <boxGeometry args={[12.8, 0.7, 1.55]} />
@@ -116,7 +120,6 @@ export const CinematicExterior: React.FC = () => {
           <Pillar position={[5.1, 3.55, -0.05]} height={7.1} radius={0.43} />
           <Pillar position={[-7.0, 3.55, -0.55]} height={7.1} radius={0.32} />
           <Pillar position={[7.0, 3.55, -0.55]} height={7.1} radius={0.32} />
-
           <mesh position={[0, 8.1, -0.38]} castShadow receiveShadow>
             <boxGeometry args={[14.9, 1.5, 1.7]} />
             <meshStandardMaterial {...plaster} color="#f3ece1" roughness={0.62} />
@@ -153,8 +156,8 @@ export const CinematicExterior: React.FC = () => {
         </mesh>
       </group>
 
-      {[[-20, 0, 6], [-27, 0, -2], [20, 0, 6], [27, 0, -2]] .map((p, i) => (
-        <Tree key={i} position={p as [number, number, number]} scale={i % 2 === 0 ? 1.05 : 0.86} />
+      {([[-20, 0, 6], [-27, 0, -2], [20, 0, 6], [27, 0, -2]] as [number, number, number][]).map((p, i) => (
+        <Tree key={i} position={p} scale={i % 2 === 0 ? 1.05 : 0.86} />
       ))}
 
       {[-12, -8, -4, 4, 8, 12].map((x) => (
