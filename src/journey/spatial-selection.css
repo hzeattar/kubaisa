@@ -1,0 +1,190 @@
+/* Spatial wing selection: let the 3D portals remain the hero and keep UI as lightweight labels. */
+.palace-journey .journey-gate{
+  position:relative;
+  display:block;
+  width:100%;
+  max-width:none;
+  min-height:148svh;
+  padding-inline:var(--page-pad);
+  pointer-events:auto;
+}
+
+.palace-journey .journey-gate::before{
+  inset:20% 7% 13%;
+  border-color:rgba(209,173,103,.055);
+}
+
+.palace-journey .journey-gate__copy{
+  position:absolute;
+  z-index:3;
+  top:max(118px,14vh);
+  inset-inline-start:var(--page-pad);
+  width:min(560px,42vw);
+  padding:18px 22px;
+  border-inline-start:1px solid rgba(207,171,99,.34);
+  background:linear-gradient(90deg,rgba(4,8,13,.54),rgba(4,8,13,0));
+  backdrop-filter:blur(7px);
+}
+
+.palace-journey .department-choice{
+  position:absolute;
+  z-index:4;
+  left:0;
+  right:0;
+  bottom:clamp(72px,12vh,150px);
+  display:grid;
+  grid-template-columns:repeat(2,minmax(220px,340px));
+  justify-content:space-between;
+  align-items:end;
+  gap:clamp(80px,22vw,360px);
+  padding-inline:clamp(7vw,13vw,17vw);
+  pointer-events:none;
+}
+
+.palace-journey .department-choice button{
+  pointer-events:auto;
+  min-height:150px;
+  padding:20px 22px 18px;
+  border:1px solid rgba(226,199,139,.28);
+  border-top-color:rgba(236,215,172,.58);
+  background:linear-gradient(180deg,rgba(8,13,20,.3),rgba(5,8,13,.7));
+  backdrop-filter:blur(8px);
+  box-shadow:0 18px 50px rgba(0,0,0,.18);
+}
+
+.palace-journey .department-choice button::before{
+  opacity:.28;
+  background:radial-gradient(circle at 50% 0%,rgba(214,178,104,.16),transparent 58%);
+}
+
+.palace-journey .department-choice--modern::after,
+.palace-journey .department-choice--classic::after{
+  inset:14px 14px auto;
+  height:38px;
+  border:1px solid rgba(232,208,157,.14);
+  border-bottom:0;
+  box-shadow:none;
+}
+
+.palace-journey .department-choice--modern::after{
+  border-radius:2px 2px 0 0;
+}
+
+.palace-journey .department-choice--classic::after{
+  border-radius:80px 80px 0 0;
+}
+
+.palace-journey .department-choice button>span{
+  font-size:9px;
+  letter-spacing:.2em;
+  color:#d0ad66;
+}
+
+.palace-journey .department-choice button>strong{
+  margin-top:26px;
+  font-size:clamp(28px,3vw,42px);
+}
+
+.palace-journey .department-choice button>small{
+  margin-top:8px;
+  max-width:30ch;
+  font-size:10px;
+  line-height:1.65;
+  color:rgba(244,239,230,.58);
+}
+
+.palace-journey .department-choice button>i{
+  inset-inline-end:18px;
+  bottom:18px;
+  width:34px;
+  height:34px;
+  font-size:16px;
+  border-color:rgba(232,212,170,.24);
+}
+
+.palace-journey .department-choice button:hover,
+.palace-journey .department-choice button.is-selected{
+  transform:translateY(-4px);
+  border-color:rgba(232,212,170,.68);
+  background:linear-gradient(180deg,rgba(13,19,27,.44),rgba(6,9,14,.78));
+  box-shadow:0 22px 62px rgba(0,0,0,.24),0 0 40px rgba(193,151,73,.055);
+}
+
+@media(max-width:1040px){
+  .palace-journey .journey-gate__copy{
+    width:min(620px,70vw);
+  }
+  .palace-journey .department-choice{
+    grid-template-columns:repeat(2,minmax(190px,300px));
+    padding-inline:6vw;
+    gap:18vw;
+  }
+}
+
+@media(max-width:720px){
+  .palace-journey .journey-gate{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap:22px;
+    min-height:150svh;
+    padding:0 18px 12vh;
+  }
+  .palace-journey .journey-gate__copy,
+  .palace-journey .department-choice{
+    position:relative;
+    inset:auto;
+    width:100%;
+  }
+  .palace-journey .journey-gate__copy{
+    padding:16px 18px;
+    background:linear-gradient(90deg,rgba(4,8,13,.62),rgba(4,8,13,.15));
+  }
+  .palace-journey .department-choice{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    padding:0;
+  }
+  .palace-journey .department-choice button{
+    min-height:142px;
+    padding:16px;
+  }
+  .palace-journey .department-choice button>strong{
+    margin-top:20px;
+    font-size:24px;
+  }
+  .palace-journey .department-choice button>small{
+    display:none;
+  }
+  .palace-journey .department-choice button>i{
+    width:30px;
+    height:30px;
+    bottom:14px;
+    inset-inline-end:14px;
+  }
+}
+
+@media(max-width:430px){
+  .palace-journey .department-choice{
+    grid-template-columns:1fr;
+  }
+  .palace-journey .department-choice button{
+    min-height:116px;
+  }
+  .palace-journey .department-choice--modern::after,
+  .palace-journey .department-choice--classic::after{
+    display:block;
+    height:28px;
+  }
+  .palace-journey .department-choice button>strong{
+    margin-top:16px;
+    font-size:23px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .palace-journey .department-choice button{
+    transition:none;
+  }
+}
