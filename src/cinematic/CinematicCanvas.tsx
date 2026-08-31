@@ -9,53 +9,106 @@ import { CinematicExterior } from './CinematicExterior';
 import { CinematicLobby } from './CinematicLobby';
 import { CinematicStaticFallback } from './CinematicVisualBoundary';
 
-const CAMERA_POINTS = [
-  new THREE.Vector3(0, 5.8, 30),
-  new THREE.Vector3(0, 4.8, 18),
-  new THREE.Vector3(0, 3.2, 8),
-  new THREE.Vector3(0, 2.2, -8),
-  new THREE.Vector3(0, 2.15, -18),
-  new THREE.Vector3(-19, 2.25, -19),
-  new THREE.Vector3(-25, 2.1, -24),
-  new THREE.Vector3(0, 2.6, -24),
-  new THREE.Vector3(20, 2.25, -20),
-  new THREE.Vector3(25, 2.1, -25),
-] as const;
+type Department = 'modern' | 'classic';
 
-const TARGET_POINTS = [
-  new THREE.Vector3(0, 8, -12),
-  new THREE.Vector3(0, 7, -13),
-  new THREE.Vector3(0, 4.5, -14),
-  new THREE.Vector3(0, 3.8, -20),
-  new THREE.Vector3(0, 3.2, -31),
-  new THREE.Vector3(-24, 2, -25),
-  new THREE.Vector3(-25, 1.4, -28),
-  new THREE.Vector3(0, 3.2, -31),
-  new THREE.Vector3(24, 2, -25),
-  new THREE.Vector3(25, 1.4, -28),
-] as const;
-
-const NORMALIZED_SCROLL_END = 0.78;
+const NORMALIZED_SCROLL_END = 1;
 const EXTERIOR = 1;
 const LOBBY = 2;
 const MODERN = 4;
 const CLASSIC = 8;
 
-function getSceneMask(progress: number) {
+function buildCameraPoints(department: Department | null) {
+  const common = [
+    new THREE.Vector3(0, 5.8, 30),
+    new THREE.Vector3(0, 4.8, 18),
+    new THREE.Vector3(0, 3.2, 8),
+    new THREE.Vector3(0, 2.2, -8),
+    new THREE.Vector3(0, 2.15, -18),
+  ];
+
+  if (department === 'modern') {
+    return [...common,
+      new THREE.Vector3(-8, 2.3, -19),
+      new THREE.Vector3(-17, 2.25, -21),
+      new THREE.Vector3(-23, 2.15, -23),
+      new THREE.Vector3(-25, 1.9, -26),
+    ];
+  }
+
+  if (department === 'classic') {
+    return [...common,
+      new THREE.Vector3(8, 2.3, -19),
+      new THREE.Vector3(17, 2.25, -21),
+      new THREE.Vector3(23, 2.15, -23),
+      new THREE.Vector3(25, 1.9, -26),
+    ];
+  }
+
+  return [...common,
+    new THREE.Vector3(0, 2.3, -22),
+    new THREE.Vector3(0, 2.5, -27),
+    new THREE.Vector3(0, 2.7, -31),
+    new THREE.Vector3(0, 2.8, -34),
+  ];
+}
+
+function buildTargetPoints(department: Department | null) {
+  const common = [
+    new THREE.Vector3(0, 8, -12),
+    new THREE.Vector3(0, 7, -13),
+    new THREE.Vector3(0, 4.5, -14),
+    new THREE.Vector3(0, 3.8, -20),
+    new THREE.Vector3(0, 3.2, -31),
+  ];
+
+  if (department === 'modern') {
+    return [...common,
+      new THREE.Vector3(-14, 2.5, -24),
+      new THREE.Vector3(-22, 2.1, -25),
+      new THREE.Vector3(-25, 1.7, -27),
+      new THREE.Vector3(-25, 1.3, -30),
+    ];
+  }
+
+  if (department === 'classic') {
+    return [...common,
+      new THREE.Vector3(14, 2.5, -24),
+      new THREE.Vector3(22, 2.1, -25),
+      new THREE.Vector3(25, 1.7, -27),
+      new THREE.Vector3(25, 1.3, -30),
+    ];
+  }
+
+  return [...common,
+    new THREE.Vector3(0, 3.2, -33),
+    new THREE.Vector3(0, 3.4, -36),
+    new THREE.Vector3(0, 3.5, -38),
+    new THREE.Vector3(0, 3.5, -39),
+  ];
+}
+
+function getSceneMask(progress: number, department: Department | null) {
   let mask = 0;
 
-  if (progress < 0.4) mask |= EXTERIOR;
-  if ((progress >= 0.34 && progress < 0.58) || (progress >= 0.72 && progress < 0.88)) mask |= LOBBY;
-  if (progress >= 0.5 && progress < 0.76) mask |= MODERN;
-  if (progress >= 0.78) mask |= CLASSIC;
+  if (progress < 0.38) mask |= EXTERIOR;
+  if (progress >= 0.28 && (department ? progress < 0.72 : true)) mask |= LOBBY;
+
+  if (department === 'modern' && progress >= 0.58) mask |= MODERN;
+  if (department === 'classic' && progress >= 0.58) mask |= CLASSIC;
 
   return mask || LOBBY;
 }
 
-function CinematicCamera() {
+function CinematicCamera({ department }: { department: Department | null }) {
   const { camera } = useThree();
-  const cameraCurve = useMemo(() => new THREE.CatmullRomCurve3([...CAMERA_POINTS], false, 'catmullrom', 0.35), []);
-  const targetCurve = useMemo(() => new THREE.CatmullRomCurve3([...TARGET_POINTS], false, 'catmullrom', 0.35), []);
+  const cameraCurve = useMemo(
+    () => new THREE.CatmullRomCurve3(buildCameraPoints(department), false, 'catmullrom', 0.32),
+    [department],
+  );
+  const targetCurve = useMemo(
+    () => new THREE.CatmullRomCurve3(buildTargetPoints(department), false, 'catmullrom', 0.32),
+    [department],
+  );
   const desiredPosition = useMemo(() => new THREE.Vector3(), []);
   const desiredTarget = useMemo(() => new THREE.Vector3(), []);
   const lookMatrix = useMemo(() => new THREE.Matrix4(), []);
@@ -63,8 +116,8 @@ function CinematicCamera() {
 
   useFrame((_, delta) => {
     const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const raw = THREE.MathUtils.clamp(cinematicScroll.progress, 0, NORMALIZED_SCROLL_END) / NORMALIZED_SCROLL_END;
-    const progress = reducedMotion ? Math.round(raw * 4) / 4 : raw;
+    const raw = THREE.MathUtils.clamp(cinematicScroll.progress, 0, NORMALIZED_SCROLL_END);
+    const progress = reducedMotion ? Math.round(raw * 5) / 5 : raw;
 
     cameraCurve.getPoint(progress, desiredPosition);
     targetCurve.getPoint(progress, desiredTarget);
@@ -81,14 +134,14 @@ function CinematicCamera() {
   return null;
 }
 
-function SceneDirector() {
-  const initialMask = getSceneMask(0);
+function SceneDirector({ department }: { department: Department | null }) {
+  const initialMask = getSceneMask(0, department);
   const [mask, setMask] = useState(initialMask);
   const maskRef = useRef(initialMask);
 
   useFrame(() => {
-    const progress = THREE.MathUtils.clamp(cinematicScroll.progress, 0, NORMALIZED_SCROLL_END) / NORMALIZED_SCROLL_END;
-    const nextMask = getSceneMask(progress);
+    const progress = THREE.MathUtils.clamp(cinematicScroll.progress, 0, NORMALIZED_SCROLL_END);
+    const nextMask = getSceneMask(progress, department);
     if (nextMask !== maskRef.current) {
       maskRef.current = nextMask;
       setMask(nextMask);
@@ -125,12 +178,12 @@ function SceneDirector() {
   );
 }
 
-function CinematicWorld() {
+function CinematicWorld({ department }: { department: Department | null }) {
   return (
     <>
       <color attach="background" args={['#07101b']} />
       <fog attach="fog" args={['#07101b', 48, 120]} />
-      <CinematicCamera />
+      <CinematicCamera department={department} />
       <ambientLight intensity={0.18} color="#ffe8cb" />
       <hemisphereLight args={['#fff0d8', '#17110c', 0.42]} />
       <directionalLight
@@ -143,12 +196,12 @@ function CinematicWorld() {
       >
         <orthographicCamera attach="shadow-camera" args={[-35, 35, 35, -35, 0.5, 120]} />
       </directionalLight>
-      <SceneDirector />
+      <SceneDirector department={department} />
     </>
   );
 }
 
-export function CinematicCanvas() {
+export function CinematicCanvas({ department }: { department: Department | null }) {
   return (
     <Canvas
       shadows
@@ -161,7 +214,7 @@ export function CinematicCanvas() {
       }}
       fallback={<CinematicStaticFallback />}
     >
-      <CinematicWorld />
+      <CinematicWorld department={department} />
     </Canvas>
   );
 }
