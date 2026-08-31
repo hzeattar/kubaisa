@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { cinematicScroll } from './scrollState';
 import { BrandFacadeSign } from './BrandFacadeSign';
 import { CinematicExterior } from './CinematicExterior';
+import { FacadeDetails } from './FacadeDetails';
 import { CinematicLobby } from './CinematicLobby';
 import { EntranceThreshold } from './EntranceThreshold';
 import { WingHall } from './WingHall';
@@ -164,6 +165,7 @@ function SceneDirector({ department }: { department: Department | null }) {
       {(mask & EXTERIOR) !== 0 && (
         <Suspense fallback={null}>
           <CinematicExterior />
+          <FacadeDetails />
           <BrandFacadeSign />
         </Suspense>
       )}
