@@ -10,7 +10,7 @@ import { FacadeDetails } from './FacadeDetails';
 import { CinematicLobby } from './CinematicLobby';
 import { LobbyArchitectureDetails } from './LobbyArchitectureDetails';
 import { EntranceThreshold } from './EntranceThreshold';
-import { WingHall } from './WingHall';
+import { WingHallRouter } from './WingHallRouter';
 import { CinematicStaticFallback } from './CinematicVisualBoundary';
 import type { Department } from '../journey/journeyModel';
 
@@ -209,7 +209,7 @@ function SceneDirector({ department }: { department: Department | null }) {
 
       {(mask & HALL) !== 0 && department && (
         <Suspense fallback={null}>
-          <WingHall department={department} />
+          <WingHallRouter department={department} />
         </Suspense>
       )}
     </>
