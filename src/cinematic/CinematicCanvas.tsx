@@ -8,6 +8,7 @@ import { BrandFacadeSign } from './BrandFacadeSign';
 import { CinematicExterior } from './CinematicExterior';
 import { FacadeDetails } from './FacadeDetails';
 import { CinematicLobby } from './CinematicLobby';
+import { LobbyArchitectureDetails } from './LobbyArchitectureDetails';
 import { EntranceThreshold } from './EntranceThreshold';
 import { WingHall } from './WingHall';
 import { CinematicStaticFallback } from './CinematicVisualBoundary';
@@ -201,6 +202,7 @@ function SceneDirector({ department }: { department: Department | null }) {
       {(mask & LOBBY) !== 0 && (
         <Suspense fallback={null}>
           <CinematicLobby />
+          <LobbyArchitectureDetails />
           <EntranceThreshold />
         </Suspense>
       )}
