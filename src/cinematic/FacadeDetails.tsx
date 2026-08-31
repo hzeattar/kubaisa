@@ -1,10 +1,14 @@
 import { Instance, Instances } from '@react-three/drei';
-import { useArchitecturalTextures } from '../components/3d/Materials';
+import {
+  useMarbleTexture,
+  useMetalTexture,
+  usePlasterTexture,
+} from '../components/3d/Materials';
 
 const gold = '#c6a15b';
 
 function EntranceLantern({ x }: { x: number }) {
-  const { metal } = useArchitecturalTextures();
+  const metal = useMetalTexture();
 
   return (
     <group position={[x, 3.9, -11.18]}>
@@ -30,7 +34,8 @@ function EntranceLantern({ x }: { x: number }) {
 }
 
 function EntrancePlanter({ x }: { x: number }) {
-  const { marble, metal } = useArchitecturalTextures();
+  const marble = useMarbleTexture();
+  const metal = useMetalTexture();
 
   return (
     <group position={[x, 0, -8.9]}>
@@ -61,7 +66,9 @@ function EntrancePlanter({ x }: { x: number }) {
 }
 
 export function FacadeDetails() {
-  const { marble, plaster, metal } = useArchitecturalTextures();
+  const marble = useMarbleTexture();
+  const plaster = usePlasterTexture();
+  const metal = useMetalTexture();
 
   return (
     <group>
@@ -132,7 +139,7 @@ export function FacadeDetails() {
       </group>
 
       {/* Fine recessed facade joints catch shadow without adding heavy geometry. */}
-      <Instances limit={9}>
+      <Instances limit={8}>
         <boxGeometry args={[0.035, 4.4, 0.035]} />
         <meshStandardMaterial color="#8e877d" roughness={0.86} />
         {[-13.4, -10.2, -7, -3.8, 3.8, 7, 10.2, 13.4].map((x) => (
