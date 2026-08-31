@@ -2,12 +2,12 @@ import { Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
 import * as THREE from 'three';
-import { Exterior } from '../scenes/exterior/Exterior';
 import { Lobby } from '../scenes/lobby/Lobby';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
 import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
 import { cinematicScroll } from './scrollState';
 import { BrandFacadeSign } from './BrandFacadeSign';
+import { CinematicExterior } from './CinematicExterior';
 
 const CAMERA_POINTS = [
   new THREE.Vector3(0, 5.8, 30),
@@ -37,24 +37,15 @@ const TARGET_POINTS = [
 
 function CinematicCamera() {
   const { camera } = useThree();
-  const cameraCurve = useMemo(
-    () => new THREE.CatmullRomCurve3([...CAMERA_POINTS], false, 'catmullrom', 0.35),
-    [],
-  );
-  const targetCurve = useMemo(
-    () => new THREE.CatmullRomCurve3([...TARGET_POINTS], false, 'catmullrom', 0.35),
-    [],
-  );
+  const cameraCurve = useMemo(() => new THREE.CatmullRomCurve3([...CAMERA_POINTS], false, 'catmullrom', 0.35), []);
+  const targetCurve = useMemo(() => new THREE.CatmullRomCurve3([...TARGET_POINTS], false, 'catmullrom', 0.35), []);
   const desiredPosition = useMemo(() => new THREE.Vector3(), []);
   const desiredTarget = useMemo(() => new THREE.Vector3(), []);
   const lookMatrix = useMemo(() => new THREE.Matrix4(), []);
   const desiredQuaternion = useMemo(() => new THREE.Quaternion(), []);
 
   useFrame((_, delta) => {
-    const reducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+    const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const raw = THREE.MathUtils.clamp(cinematicScroll.progress, 0, 0.78) / 0.78;
     const progress = reducedMotion ? Math.round(raw * 4) / 4 : raw;
 
@@ -77,12 +68,11 @@ function CinematicWorld() {
   return (
     <>
       <CinematicCamera />
-
-      <ambientLight intensity={0.22} color="#ffe8cb" />
-      <hemisphereLight args={['#fff0d8', '#17110c', 0.5]} />
+      <ambientLight intensity={0.2} color="#ffe8cb" />
+      <hemisphereLight args={['#fff0d8', '#17110c', 0.46]} />
       <directionalLight
         position={[22, 28, 28]}
-        intensity={1.35}
+        intensity={1.25}
         color="#ffe3b0"
         castShadow
         shadow-bias={-0.0004}
@@ -92,17 +82,12 @@ function CinematicWorld() {
       </directionalLight>
 
       <group>
-        <Exterior />
+        <CinematicExterior />
         <BrandFacadeSign />
         <Lobby />
-        <group position={[-25, 0, -20]}>
-          <ModernLiving />
-        </group>
-        <group position={[25, 0, -20]}>
-          <NeoClassicLiving />
-        </group>
+        <group position={[-25, 0, -20]}><ModernLiving /></group>
+        <group position={[25, 0, -20]}><NeoClassicLiving /></group>
       </group>
-
       <Preload all />
     </>
   );
@@ -114,20 +99,14 @@ export function CinematicCanvas() {
       shadows
       dpr={[1, 1.6]}
       camera={{ position: [0, 5.8, 30], fov: 43, near: 0.1, far: 180 }}
-      gl={{
-        antialias: true,
-        powerPreference: 'high-performance',
-        toneMapping: THREE.ACESFilmicToneMapping,
-      }}
+      gl={{ antialias: true, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping }}
       onCreated={({ gl }) => {
         gl.toneMappingExposure = 0.92;
         gl.outputColorSpace = THREE.SRGBColorSpace;
       }}
       fallback={<div className="cinematic-webgl-fallback" />}
     >
-      <Suspense fallback={null}>
-        <CinematicWorld />
-      </Suspense>
+      <Suspense fallback={null}><CinematicWorld /></Suspense>
     </Canvas>
   );
 }
