@@ -19,18 +19,23 @@ type ChapterCopy = { eyebrow: string; title: string; body: string };
 
 const COPY: Record<Language, any> = {
   ar: {
-    navJourney: 'رحلة القصر',
+    navJourney: 'دخول القصر',
     navContact: 'تواصل معنا',
-    scroll: 'مرّر للاقتراب من القصر',
+    scroll: 'مرّر للتقدم نحو المدخل',
     hero: {
       eyebrow: 'QUBAISA FURNITURE',
       title: 'قصر قبيصة الافتراضي',
-      body: 'رحلة ثلاثية الأبعاد مصممة كزيارة حقيقية: اقترب من القصر، اختر الجناح، ثم ادخل الغرفة واستكشف الأثاث من الداخل.',
+      body: 'ابدأ من خارج القصر. لا توجد قوائم ولا أقسام الآن؛ فقط تقدّم بالتمرير حتى تصل إلى المدخل وتبدأ الزيارة من مكانها الطبيعي.',
+    },
+    entrance: {
+      eyebrow: 'THE ENTRANCE',
+      title: 'الأبواب تفتح لك',
+      body: 'استمر في التمرير. الكاميرا تعبر المدخل الحقيقي ثم الردهة الداخلية خطوة بخطوة، من إضاءة الواجهة إلى دفء اللوبي، قبل أن نطلب منك اختيار أي قسم.',
     },
     gate: {
-      eyebrow: 'البوابة الرئيسية',
-      title: 'اختر عالمك داخل قبيصة',
-      body: 'وصلت إلى نقطة القرار الأولى. اختر المودرن أو النيو كلاسيك؛ بعدها تتحرك الرحلة داخل هول معماري مخصص للجناح الذي اخترته.',
+      eyebrow: 'GRAND LOBBY',
+      title: 'أنت الآن داخل قصر قبيصة',
+      body: 'بعد الوصول إلى قلب اللوبي تظهر نقطة القرار الأولى فقط الآن. أمامك جناحان معماريان واضحان: المودرن والنيو كلاسيك. اختر الطريق الذي تريد أن نكمل فيه.',
     },
     modernHall: {
       eyebrow: 'MODERN WING',
@@ -49,7 +54,7 @@ const COPY: Record<Language, any> = {
     },
     chooseDepartment: 'اختر الجناح',
     selected: 'الجناح الحالي',
-    change: 'العودة للبوابة',
+    change: 'العودة للّوبي',
     enter: 'دخول الغرفة',
     preview: 'معاينة — قريبًا',
     ready: 'جاهزة للاستكشاف',
@@ -58,18 +63,23 @@ const COPY: Record<Language, any> = {
     facebook: 'صفحة قبيصة على فيسبوك',
   },
   en: {
-    navJourney: 'Palace Journey',
+    navJourney: 'Enter Palace',
     navContact: 'Contact',
-    scroll: 'Scroll toward the palace',
+    scroll: 'Scroll toward the entrance',
     hero: {
       eyebrow: 'QUBAISA FURNITURE',
       title: 'Qubaisa Virtual Palace',
-      body: 'A guided 3D visit: approach the palace, choose a wing, enter a room and explore the furniture from inside the space.',
+      body: 'Begin outside the palace. No catalog and no department choice yet — simply scroll forward until you reach the entrance and begin the visit naturally.',
+    },
+    entrance: {
+      eyebrow: 'THE ENTRANCE',
+      title: 'The doors open for you',
+      body: 'Keep scrolling. The camera crosses the real threshold and vestibule step by step, moving from the exterior light into the warmth of the Grand Lobby before asking you to choose a collection.',
     },
     gate: {
-      eyebrow: 'MAIN GATE',
-      title: 'Choose your world inside Qubaisa',
-      body: 'This is the first decision point. Choose Modern or Neo-Classical and the journey continues through a dedicated architectural hall.',
+      eyebrow: 'GRAND LOBBY',
+      title: 'You are now inside Qubaisa Palace',
+      body: 'Only now does the first decision appear. Two architectural paths are visible ahead: Modern and Neo-Classical. Choose the wing you want to explore next.',
     },
     modernHall: {
       eyebrow: 'MODERN WING',
@@ -88,7 +98,7 @@ const COPY: Record<Language, any> = {
     },
     chooseDepartment: 'Choose a wing',
     selected: 'Current wing',
-    change: 'Back to gate',
+    change: 'Back to lobby',
     enter: 'Enter room',
     preview: 'Preview — coming soon',
     ready: 'Ready to explore',
@@ -174,7 +184,7 @@ export default function App() {
           <img src="/brand/qubaisa-logo.webp" alt="Qubaisa Furniture" />
         </a>
         <nav className="cinematic-nav" aria-label="Primary">
-          <a href="#gate">{copy.navJourney}</a>
+          <a href="#entrance">{copy.navJourney}</a>
           <a href="#contact">{copy.navContact}</a>
           <button
             type="button"
@@ -201,10 +211,17 @@ export default function App() {
         <div className="scroll-cue"><span>{copy.scroll}</span><i /></div>
       </section>
 
-      <section id="gate" className="story-chapter journey-gate">
+      <section id="entrance" className="story-chapter journey-entrance">
+        <div className="journey-entrance__copy">
+          <span className="journey-step-label">02 — {language === 'ar' ? 'الدخول' : 'Entrance'}</span>
+          <Chapter copy={copy.entrance} align={language === 'ar' ? 'left' : 'right'} />
+        </div>
+      </section>
+
+      <section id="gate" className="story-chapter journey-gate journey-gate--inside">
         <div className="journey-gate__copy">
           <Chapter copy={copy.gate} align={language === 'ar' ? 'right' : 'left'} />
-          <span className="journey-step-label">02 — {copy.chooseDepartment}</span>
+          <span className="journey-step-label">03 — {copy.chooseDepartment}</span>
         </div>
 
         <div className="department-choice" role="group" aria-label={copy.chooseDepartment} style={{ direction: 'ltr' }}>
