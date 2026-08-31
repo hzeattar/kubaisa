@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 
 export type InteractiveRoom = {
   department: 'modern' | 'classic';
@@ -10,6 +10,8 @@ interface Props {
   language: 'ar' | 'en';
   onClose: () => void;
 }
+
+export const ROOM_RUNTIME_EVENT = 'qubaisa:room-runtime';
 
 const InteractiveRoomExperienceImpl = lazy(() => import('./InteractiveRoomExperienceImpl'));
 
@@ -35,6 +37,13 @@ function RoomChunkFallback({ room, language }: Pick<Props, 'room' | 'language'>)
  * actually enters a production-ready room.
  */
 export function InteractiveRoomExperience(props: Props) {
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(ROOM_RUNTIME_EVENT, { detail: { active: true } }));
+    return () => {
+      window.dispatchEvent(new CustomEvent(ROOM_RUNTIME_EVENT, { detail: { active: false } }));
+    };
+  }, []);
+
   return (
     <Suspense fallback={<RoomChunkFallback room={props.room} language={props.language} />}>
       <InteractiveRoomExperienceImpl {...props} />
