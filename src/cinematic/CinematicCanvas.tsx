@@ -7,6 +7,7 @@ import { Lobby } from '../scenes/lobby/Lobby';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
 import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
 import { cinematicScroll } from './scrollState';
+import { BrandFacadeSign } from './BrandFacadeSign';
 
 const CAMERA_POINTS = [
   new THREE.Vector3(0, 5.8, 30),
@@ -92,6 +93,7 @@ function CinematicWorld() {
 
       <group>
         <Exterior />
+        <BrandFacadeSign />
         <Lobby />
         <group position={[-25, 0, -20]}>
           <ModernLiving />
