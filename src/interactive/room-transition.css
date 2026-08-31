@@ -1,0 +1,136 @@
+.interactive-room {
+  animation: room-shell-enter .34s ease-out both;
+}
+
+.interactive-room__canvas {
+  transform-origin: 50% 50%;
+  animation: room-canvas-enter .72s cubic-bezier(.2,.72,.18,1) both;
+}
+
+.room-entry-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  pointer-events: none;
+  color: #f5efe5;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(29,31,31,.2), rgba(5,8,11,.96) 72%),
+    #05080b;
+  animation: room-veil-release 1.02s cubic-bezier(.3,.7,.2,1) both;
+}
+
+.room-entry-veil span {
+  color: #c8a65e;
+  font-size: 9px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+
+.room-entry-veil strong {
+  font-size: clamp(24px, 4vw, 46px);
+  font-weight: 500;
+  letter-spacing: -.02em;
+}
+
+.room-entry-veil i {
+  width: 54px;
+  height: 1px;
+  margin-top: 5px;
+  background: linear-gradient(90deg, transparent, #d1ae63, transparent);
+  transform-origin: center;
+  animation: room-veil-line .72s ease-out both;
+}
+
+.interactive-room__topbar {
+  animation: room-hud-enter .46s .44s ease-out both;
+}
+
+.room-viewpoints {
+  animation: room-hud-enter .46s .56s ease-out both;
+}
+
+.room-price-hotspot {
+  animation: room-hotspot-enter .38s .7s ease-out both;
+}
+
+.interactive-room.is-closing {
+  pointer-events: none;
+  animation: room-shell-exit .34s cubic-bezier(.55,0,.8,.45) forwards;
+}
+
+.interactive-room.is-closing .room-entry-veil {
+  display: none;
+}
+
+.interactive-room.is-closing .interactive-room__canvas {
+  animation: none;
+  opacity: 0;
+  transform: scale(.992);
+  transition: opacity .3s ease, transform .34s ease;
+}
+
+.interactive-room.is-closing .interactive-room__topbar,
+.interactive-room.is-closing .room-viewpoints,
+.interactive-room.is-closing .room-product-sheet,
+.interactive-room.is-closing .room-price-hotspot {
+  animation: none;
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+
+@keyframes room-shell-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes room-canvas-enter {
+  from { opacity: 0; transform: scale(1.014); }
+  45% { opacity: .74; }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes room-veil-release {
+  0%, 24% { opacity: 1; }
+  62% { opacity: .9; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes room-veil-line {
+  from { opacity: 0; transform: scaleX(.2); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes room-hud-enter {
+  from { opacity: 0; transform: translateY(-7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes room-hotspot-enter {
+  from { opacity: 0; transform: translateY(6px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes room-shell-exit {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-room,
+  .interactive-room__canvas,
+  .interactive-room__topbar,
+  .room-viewpoints,
+  .room-price-hotspot,
+  .interactive-room.is-closing {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .room-entry-veil {
+    display: none;
+  }
+}
