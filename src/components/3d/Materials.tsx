@@ -1,24 +1,40 @@
 import { useEffect } from 'react';
 import { useTexture } from '@react-three/drei';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 type TextureSet = Partial<Record<'map' | 'normalMap' | 'roughnessMap', THREE.Texture>>;
 type TexturePaths = Record<'map' | 'normalMap' | 'roughnessMap', string>;
 
-const configureTextureSet = (textures: TextureSet, repeatX: number, repeatY: number) => {
+const configureTextureSet = (
+  textures: TextureSet,
+  repeatX: number,
+  repeatY: number,
+  maxAnisotropy: number,
+) => {
   Object.entries(textures).forEach(([key, texture]) => {
     if (!texture) return;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(repeatX, repeatY);
     texture.colorSpace = key === 'map' ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = true;
+    texture.anisotropy = Math.min(4, Math.max(1, maxAnisotropy));
     texture.needsUpdate = true;
   });
 };
 
 function usePbrTextureSet(paths: Partial<TexturePaths>, repeatX: number, repeatY: number) {
   const textures = useTexture(paths as Record<string, string>) as TextureSet;
-  useEffect(() => configureTextureSet(textures, repeatX, repeatY), [textures, repeatX, repeatY]);
+  const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
+
+  useEffect(
+    () => configureTextureSet(textures, repeatX, repeatY, maxAnisotropy),
+    [textures, repeatX, repeatY, maxAnisotropy],
+  );
+
   return textures;
 }
 
