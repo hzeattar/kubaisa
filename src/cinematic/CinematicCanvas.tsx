@@ -1,6 +1,5 @@
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Preload } from '@react-three/drei';
 import * as THREE from 'three';
 import { Lobby } from '../scenes/lobby/Lobby';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
@@ -8,6 +7,7 @@ import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
 import { cinematicScroll } from './scrollState';
 import { BrandFacadeSign } from './BrandFacadeSign';
 import { CinematicExterior } from './CinematicExterior';
+import { CinematicStaticFallback } from './CinematicVisualBoundary';
 
 const CAMERA_POINTS = [
   new THREE.Vector3(0, 5.8, 30),
@@ -35,6 +35,27 @@ const TARGET_POINTS = [
   new THREE.Vector3(25, 1.4, -28),
 ] as const;
 
+const NORMALIZED_SCROLL_END = 0.78;
+const EXTERIOR = 1;
+const LOBBY = 2;
+const MODERN = 4;
+const CLASSIC = 8;
+
+function getSceneMask(progress: number) {
+  let mask = 0;
+
+  // The old implementation rendered every room at the same time. That meant
+  // the lobby entrance wall could sit in front of the exterior hero shot and
+  // distant rooms could leak into unrelated camera angles. These windows keep
+  // only the current act and a small transition overlap mounted.
+  if (progress < 0.4) mask |= EXTERIOR;
+  if ((progress >= 0.34 && progress < 0.58) || (progress >= 0.72 && progress < 0.88)) mask |= LOBBY;
+  if (progress >= 0.5 && progress < 0.76) mask |= MODERN;
+  if (progress >= 0.78) mask |= CLASSIC;
+
+  return mask || LOBBY;
+}
+
 function CinematicCamera() {
   const { camera } = useThree();
   const cameraCurve = useMemo(() => new THREE.CatmullRomCurve3([...CAMERA_POINTS], false, 'catmullrom', 0.35), []);
@@ -46,7 +67,7 @@ function CinematicCamera() {
 
   useFrame((_, delta) => {
     const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const raw = THREE.MathUtils.clamp(cinematicScroll.progress, 0, 0.78) / 0.78;
+    const raw = THREE.MathUtils.clamp(cinematicScroll.progress, 0, NORMALIZED_SCROLL_END) / NORMALIZED_SCROLL_END;
     const progress = reducedMotion ? Math.round(raw * 4) / 4 : raw;
 
     cameraCurve.getPoint(progress, desiredPosition);
@@ -64,9 +85,54 @@ function CinematicCamera() {
   return null;
 }
 
+function SceneDirector() {
+  const initialMask = getSceneMask(0);
+  const [mask, setMask] = useState(initialMask);
+  const maskRef = useRef(initialMask);
+
+  useFrame(() => {
+    const progress = THREE.MathUtils.clamp(cinematicScroll.progress, 0, NORMALIZED_SCROLL_END) / NORMALIZED_SCROLL_END;
+    const nextMask = getSceneMask(progress);
+    if (nextMask !== maskRef.current) {
+      maskRef.current = nextMask;
+      setMask(nextMask);
+    }
+  });
+
+  return (
+    <>
+      {(mask & EXTERIOR) !== 0 && (
+        <Suspense fallback={null}>
+          <CinematicExterior />
+          <BrandFacadeSign />
+        </Suspense>
+      )}
+
+      {(mask & LOBBY) !== 0 && (
+        <Suspense fallback={null}>
+          <Lobby />
+        </Suspense>
+      )}
+
+      {(mask & MODERN) !== 0 && (
+        <Suspense fallback={null}>
+          <group position={[-25, 0, -20]}><ModernLiving /></group>
+        </Suspense>
+      )}
+
+      {(mask & CLASSIC) !== 0 && (
+        <Suspense fallback={null}>
+          <group position={[25, 0, -20]}><NeoClassicLiving /></group>
+        </Suspense>
+      )}
+    </>
+  );
+}
+
 function CinematicWorld() {
   return (
     <>
+      <color attach="background" args={['#07101b']} />
       <CinematicCamera />
       <ambientLight intensity={0.2} color="#ffe8cb" />
       <hemisphereLight args={['#fff0d8', '#17110c', 0.46]} />
@@ -80,15 +146,7 @@ function CinematicWorld() {
       >
         <orthographicCamera attach="shadow-camera" args={[-35, 35, 35, -35, 0.5, 120]} />
       </directionalLight>
-
-      <group>
-        <CinematicExterior />
-        <BrandFacadeSign />
-        <Lobby />
-        <group position={[-25, 0, -20]}><ModernLiving /></group>
-        <group position={[25, 0, -20]}><NeoClassicLiving /></group>
-      </group>
-      <Preload all />
+      <SceneDirector />
     </>
   );
 }
@@ -104,9 +162,9 @@ export function CinematicCanvas() {
         gl.toneMappingExposure = 0.92;
         gl.outputColorSpace = THREE.SRGBColorSpace;
       }}
-      fallback={<div className="cinematic-webgl-fallback" />}
+      fallback={<CinematicStaticFallback />}
     >
-      <Suspense fallback={null}><CinematicWorld /></Suspense>
+      <CinematicWorld />
     </Canvas>
   );
 }
