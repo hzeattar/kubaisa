@@ -1,4 +1,3 @@
-import type { ComponentProps } from 'react';
 import {
   useMarbleTexture,
   useMetalTexture,
@@ -7,7 +6,7 @@ import {
 } from '../components/3d/Materials';
 
 const gold = '#c6a15b';
-type TextureSet = ComponentProps<'meshStandardMaterial'>;
+type TextureSet = ReturnType<typeof useMarbleTexture>;
 
 function PortalFrame({
   x,
