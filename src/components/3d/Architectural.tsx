@@ -27,7 +27,6 @@ export const Pillar: React.FC<{ position: [number, number, number]; height?: num
         <meshStandardMaterial {...plaster} color="#eee8df" roughness={0.56} />
       </mesh>
 
-      {/* Slight taper gives the shaft a classical entasis-like silhouette without dense geometry. */}
       <mesh castShadow receiveShadow>
         <cylinderGeometry args={[radius * 0.9, radius, shaftHeight, 24]} />
         <meshStandardMaterial {...plaster} color="#eee8df" roughness={0.64} />
@@ -51,7 +50,7 @@ export const Pillar: React.FC<{ position: [number, number, number]; height?: num
 
 function WarmInterior({ width, height, y = 0 }: { width: number; height: number; y?: number }) {
   return (
-    <mesh position={[0, y, -0.035]}>
+    <mesh position={[0, y, 0.118]}>
       <planeGeometry args={[width * 0.92, height * 0.92]} />
       <meshStandardMaterial
         color="#8d6748"
@@ -66,7 +65,7 @@ function WarmInterior({ width, height, y = 0 }: { width: number; height: number;
 
 function ExteriorGlass({ width, height, y = 0 }: { width: number; height: number; y?: number }) {
   return (
-    <mesh position={[0, y, 0.1]}>
+    <mesh position={[0, y, 0.132]}>
       <planeGeometry args={[width, height]} />
       <meshPhysicalMaterial
         color="#07121a"
@@ -99,7 +98,6 @@ export const Window: React.FC<{
 
     return (
       <group position={position}>
-        {/* Recessed stone surround creates real facade depth and self-shadow. */}
         <mesh position={[0, 0, -0.18]} castShadow receiveShadow>
           <boxGeometry args={[width + 0.82, height + 0.72, 0.58]} />
           <meshStandardMaterial {...plaster} color="#d9d1c5" roughness={0.68} />
@@ -112,11 +110,11 @@ export const Window: React.FC<{
         <WarmInterior width={width} height={rectHeight} y={rectCenterY} />
         <ExteriorGlass width={width} height={rectHeight} y={rectCenterY} />
 
-        <mesh position={[0, archCenterY, -0.035]}>
+        <mesh position={[0, archCenterY, 0.118]}>
           <circleGeometry args={[radius * 0.94, 36, 0, Math.PI]} />
           <meshStandardMaterial color="#8d6748" emissive="#d58f4c" emissiveIntensity={0.3} side={2} />
         </mesh>
-        <mesh position={[0, archCenterY, 0.095]}>
+        <mesh position={[0, archCenterY, 0.132]}>
           <circleGeometry args={[radius, 40, 0, Math.PI]} />
           <meshPhysicalMaterial
             color="#07121a"
@@ -130,25 +128,25 @@ export const Window: React.FC<{
             side={2}
           />
         </mesh>
-        <mesh position={[0, archCenterY, 0.13]} castShadow>
+        <mesh position={[0, archCenterY, 0.16]} castShadow>
           <torusGeometry args={[radius + 0.11, 0.095, 10, 42, Math.PI]} />
           <meshStandardMaterial {...metal} color="#9f7e44" roughness={0.34} metalness={0.88} />
         </mesh>
 
-        <mesh position={[0, rectCenterY, 0.145]} castShadow>
+        <mesh position={[0, rectCenterY, 0.16]} castShadow>
           <boxGeometry args={[0.058, rectHeight, 0.11]} />
           <meshStandardMaterial color="#26211d" roughness={0.48} metalness={0.84} />
         </mesh>
-        <mesh position={[0, rectCenterY + rectHeight * 0.18, 0.145]} castShadow>
+        <mesh position={[0, rectCenterY + rectHeight * 0.18, 0.16]} castShadow>
           <boxGeometry args={[width, 0.052, 0.11]} />
           <meshStandardMaterial color="#26211d" roughness={0.48} metalness={0.84} />
         </mesh>
-        <mesh position={[0, rectCenterY - rectHeight * 0.22, 0.145]} castShadow>
+        <mesh position={[0, rectCenterY - rectHeight * 0.22, 0.16]} castShadow>
           <boxGeometry args={[width, 0.052, 0.11]} />
           <meshStandardMaterial color="#26211d" roughness={0.48} metalness={0.84} />
         </mesh>
 
-        <mesh position={[0, -height / 2 - 0.28, 0.13]} castShadow receiveShadow>
+        <mesh position={[0, -height / 2 - 0.28, 0.14]} castShadow receiveShadow>
           <boxGeometry args={[width + 0.92, 0.18, 0.72]} />
           <meshStandardMaterial {...plaster} color="#d7cec1" roughness={0.56} />
         </mesh>
@@ -170,19 +168,19 @@ export const Window: React.FC<{
       <WarmInterior width={width} height={height} />
       <ExteriorGlass width={width} height={height} />
 
-      <mesh position={[0, 0, 0.145]} castShadow receiveShadow>
+      <mesh position={[0, 0, 0.16]} castShadow receiveShadow>
         <boxGeometry args={[0.052, height, 0.11]} />
         <meshStandardMaterial color="#26211d" roughness={0.48} metalness={0.84} />
       </mesh>
-      <mesh position={[0, height / 4, 0.145]} castShadow receiveShadow>
+      <mesh position={[0, height / 4, 0.16]} castShadow receiveShadow>
         <boxGeometry args={[width, 0.052, 0.11]} />
         <meshStandardMaterial color="#26211d" roughness={0.48} metalness={0.84} />
       </mesh>
-      <mesh position={[0, -height / 4, 0.145]} castShadow receiveShadow>
+      <mesh position={[0, -height / 4, 0.16]} castShadow receiveShadow>
         <boxGeometry args={[width, 0.052, 0.11]} />
         <meshStandardMaterial color="#26211d" roughness={0.48} metalness={0.84} />
       </mesh>
-      <mesh position={[0, -height / 2 - 0.28, 0.12]} castShadow receiveShadow>
+      <mesh position={[0, -height / 2 - 0.28, 0.14]} castShadow receiveShadow>
         <boxGeometry args={[width + 0.88, 0.18, 0.68]} />
         <meshStandardMaterial {...plaster} color="#d5ccbe" roughness={0.56} />
       </mesh>
