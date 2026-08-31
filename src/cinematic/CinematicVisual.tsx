@@ -38,7 +38,6 @@ export function CinematicVisual() {
         const desired = cinematicScroll.progress * Math.max(0, video.duration - 0.04);
         const delta = desired - video.currentTime;
 
-        // Smooth tiny scroll changes, but seek immediately when the user jumps far.
         if (Math.abs(delta) > 0.6) {
           video.currentTime = desired;
         } else if (Math.abs(delta) > 0.025) {
@@ -62,7 +61,6 @@ export function CinematicVisual() {
   return (
     <video
       ref={videoRef}
-      className="cinematic-video"
       src={source}
       poster={poster}
       preload="metadata"
@@ -70,6 +68,13 @@ export function CinematicVisual() {
       playsInline
       aria-hidden="true"
       tabIndex={-1}
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'block',
+        objectFit: 'cover',
+        objectPosition: 'center',
+      }}
     />
   );
 }
