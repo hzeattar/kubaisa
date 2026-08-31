@@ -1,10 +1,16 @@
 import React from 'react';
 import { Environment } from '@react-three/drei';
 import { Pillar, Window } from '../components/3d/Architectural';
-import { useSharedTextures } from '../components/3d/Materials';
+import {
+  useMarbleTexture,
+  useMetalTexture,
+  usePlasterTexture,
+} from '../components/3d/Materials';
 
 const Wing: React.FC<{ x: number; mirror?: boolean }> = ({ x, mirror = false }) => {
-  const { plaster, marble, metal } = useSharedTextures();
+  const plaster = usePlasterTexture();
+  const marble = useMarbleTexture();
+  const metal = useMetalTexture();
   const sign = mirror ? -1 : 1;
 
   return (
@@ -65,7 +71,9 @@ const Tree: React.FC<{ position: [number, number, number]; scale?: number }> = (
 );
 
 export const CinematicExterior: React.FC = () => {
-  const { plaster, marble, metal } = useSharedTextures();
+  const plaster = usePlasterTexture();
+  const marble = useMarbleTexture();
+  const metal = useMetalTexture();
 
   return (
     <group>
@@ -81,7 +89,6 @@ export const CinematicExterior: React.FC = () => {
       </mesh>
 
       <group position={[0, 0, -14]}>
-        {/* Central pavilion is segmented around a real entrance void so the scroll camera never crosses a solid wall. */}
         <mesh position={[-6.45, 5.4, -0.25]} castShadow receiveShadow>
           <boxGeometry args={[5.1, 10.8, 4.7]} />
           <meshStandardMaterial {...plaster} color="#eee7dc" roughness={0.66} />
@@ -162,7 +169,10 @@ export const CinematicExterior: React.FC = () => {
 
       {[-12, -8, -4, 4, 8, 12].map((x) => (
         <group key={x} position={[x, 0, 12]}>
-          <mesh position={[0, 0.45, 0]} castShadow><cylinderGeometry args={[0.07, 0.1, 0.9, 12]} /><meshStandardMaterial color="#282725" metalness={0.7} roughness={0.42} /></mesh>
+          <mesh position={[0, 0.45, 0]} castShadow>
+            <cylinderGeometry args={[0.07, 0.1, 0.9, 12]} />
+            <meshStandardMaterial color="#282725" metalness={0.7} roughness={0.42} />
+          </mesh>
           <pointLight position={[0, 0.95, 0]} intensity={1.4} distance={4.2} color="#ffd89a" />
         </group>
       ))}
