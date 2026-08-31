@@ -50,11 +50,7 @@
 }
 
 .room-viewpoints {
-  animation: room-hud-enter .46s .56s ease-out both;
-}
-
-.room-price-hotspot {
-  animation: room-hotspot-enter .38s .7s ease-out both;
+  animation: room-viewpoints-enter .46s .56s ease-out both;
 }
 
 .interactive-room.is-closing {
@@ -109,9 +105,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes room-hotspot-enter {
-  from { opacity: 0; transform: translateY(6px) scale(.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes room-viewpoints-enter {
+  from { opacity: 0; transform: translateX(50%) translateY(7px); }
+  to { opacity: 1; transform: translateX(50%) translateY(0); }
 }
 
 @keyframes room-shell-exit {
@@ -124,7 +120,6 @@
   .interactive-room__canvas,
   .interactive-room__topbar,
   .room-viewpoints,
-  .room-price-hotspot,
   .interactive-room.is-closing {
     animation: none !important;
     transition: none !important;
