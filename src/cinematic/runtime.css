@@ -1,0 +1,100 @@
+.cinematic-static-fallback {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(205, 174, 108, .14), transparent 24%),
+    linear-gradient(180deg, #101927 0%, #07101b 58%, #030609 100%);
+}
+
+.cinematic-static-fallback::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 38%, rgba(0,0,0,.48) 100%);
+}
+
+.cinematic-static-fallback__glow {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  width: min(70vw, 900px);
+  height: min(55vw, 600px);
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(211, 179, 105, .1);
+  filter: blur(90px);
+}
+
+.cinematic-static-fallback__architecture {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: min(92vw, 1180px);
+  height: min(48vw, 520px);
+  transform: translateX(-50%);
+  opacity: .86;
+}
+
+.cinematic-static-fallback__center,
+.cinematic-static-fallback__wing {
+  position: absolute;
+  bottom: 0;
+  border: 1px solid rgba(224, 210, 186, .12);
+  background:
+    linear-gradient(90deg, transparent 12%, rgba(201, 164, 93, .06) 13%, transparent 14%, transparent 86%, rgba(201, 164, 93, .06) 87%, transparent 88%),
+    linear-gradient(180deg, #d9d0c2 0%, #9c958b 100%);
+  box-shadow: 0 50px 90px rgba(0,0,0,.5);
+}
+
+.cinematic-static-fallback__center {
+  left: 50%;
+  width: 28%;
+  height: 88%;
+  transform: translateX(-50%);
+  clip-path: polygon(8% 9%, 92% 9%, 92% 100%, 8% 100%);
+}
+
+.cinematic-static-fallback__center::after {
+  content: '';
+  position: absolute;
+  left: 28%;
+  right: 28%;
+  bottom: 0;
+  height: 56%;
+  background: linear-gradient(180deg, #13202c, #05090e);
+  border: 1px solid rgba(218, 183, 101, .28);
+}
+
+.cinematic-static-fallback__wing {
+  width: 38%;
+  height: 66%;
+}
+
+.cinematic-static-fallback__wing--left { left: 2%; }
+.cinematic-static-fallback__wing--right { right: 2%; }
+
+.cinematic-static-fallback > img {
+  position: absolute;
+  z-index: 2;
+  top: 24%;
+  width: min(210px, 38vw);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 34px rgba(0,0,0,.5));
+}
+
+@media (max-width: 720px) {
+  .cinematic-static-fallback__architecture {
+    width: 150vw;
+    height: 72vw;
+    bottom: 13%;
+  }
+
+  .cinematic-static-fallback > img {
+    top: 22%;
+    width: min(170px, 42vw);
+  }
+}

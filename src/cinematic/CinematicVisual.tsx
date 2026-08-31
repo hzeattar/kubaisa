@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CinematicCanvas } from './CinematicCanvas';
 import { cinematicScroll } from './scrollState';
+import { CinematicStaticFallback, CinematicVisualBoundary } from './CinematicVisualBoundary';
 
 const CINEMATIC_SCROLL_END = 0.78;
 
@@ -11,15 +12,17 @@ const getIsMobile = () => {
 
 export function CinematicVisual() {
   const [isMobile, setIsMobile] = useState(getIsMobile);
+  const [videoFailed, setVideoFailed] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const rafRef = useRef<number | null>(null);
 
-  const source = useMemo(() => {
+  const configuredSource = useMemo(() => {
     const desktop = import.meta.env.VITE_CINEMATIC_VIDEO_DESKTOP;
     const mobile = import.meta.env.VITE_CINEMATIC_VIDEO_MOBILE;
     return isMobile ? (mobile || desktop) : desktop;
   }, [isMobile]);
 
+  const source = videoFailed ? undefined : configuredSource;
   const poster = import.meta.env.VITE_CINEMATIC_POSTER;
 
   useEffect(() => {
@@ -29,6 +32,10 @@ export function CinematicVisual() {
     media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
   }, []);
+
+  useEffect(() => {
+    setVideoFailed(false);
+  }, [configuredSource]);
 
   useEffect(() => {
     if (!source) return;
@@ -54,30 +61,41 @@ export function CinematicVisual() {
     rafRef.current = window.requestAnimationFrame(tick);
     return () => {
       if (rafRef.current) window.cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
     };
   }, [source]);
 
   if (!source) {
-    return <CinematicCanvas />;
+    return (
+      <CinematicVisualBoundary>
+        <CinematicCanvas />
+      </CinematicVisualBoundary>
+    );
   }
 
   return (
-    <video
-      ref={videoRef}
-      src={source}
-      poster={poster}
-      preload="metadata"
-      muted
-      playsInline
-      aria-hidden="true"
-      tabIndex={-1}
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'block',
-        objectFit: 'cover',
-        objectPosition: 'center',
-      }}
-    />
+    <CinematicVisualBoundary>
+      <video
+        ref={videoRef}
+        src={source}
+        poster={poster}
+        preload="metadata"
+        muted
+        playsInline
+        aria-hidden="true"
+        tabIndex={-1}
+        onError={() => setVideoFailed(true)}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'block',
+          objectFit: 'cover',
+          objectPosition: 'center',
+          background: '#05070b',
+        }}
+      >
+        <CinematicStaticFallback />
+      </video>
+    </CinematicVisualBoundary>
   );
 }
