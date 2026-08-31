@@ -77,7 +77,7 @@ export const CinematicExterior: React.FC = () => {
 
   return (
     <group>
-      <Environment preset="sunset" background blur={0.12} />
+      <Environment files="/hdri/venice_sunset_1k.hdr" background blur={0.12} />
 
       <mesh position={[0, -0.08, -4]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[130, 95]} />

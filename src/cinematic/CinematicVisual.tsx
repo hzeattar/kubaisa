@@ -15,13 +15,14 @@ export function CinematicVisual({ department }: { department: Department | null 
   const rafRef = useRef<number | null>(null);
 
   const configuredSource = useMemo(() => {
-    const desktop = import.meta.env.VITE_CINEMATIC_VIDEO_DESKTOP;
-    const mobile = import.meta.env.VITE_CINEMATIC_VIDEO_MOBILE;
-    return isMobile ? (mobile || desktop) : desktop;
+    const desktop = import.meta.env.VITE_CINEMATIC_VIDEO_DESKTOP || '';
+    const mobile = import.meta.env.VITE_CINEMATIC_VIDEO_MOBILE || '';
+    const src = isMobile ? (mobile || desktop) : desktop;
+    return src && src.trim() !== '' ? src : undefined;
   }, [isMobile]);
 
   const source = department || videoFailed ? undefined : configuredSource;
-  const poster = import.meta.env.VITE_CINEMATIC_POSTER;
+  const poster = import.meta.env.VITE_CINEMATIC_POSTER || undefined;
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 800px)');

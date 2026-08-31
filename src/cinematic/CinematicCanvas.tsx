@@ -93,14 +93,9 @@ function SceneDirector({ department }: { department: Department | null }) {
     {(mask & LOBBY) !== 0 && <Suspense fallback={null}><CinematicLobby /></Suspense>}
     {(mask & MODERN) !== 0 && <Suspense fallback={null}>
       <group position={[-25,0,-30]}><ModernLiving /></group>
-      <group position={[-25,0,-55]}><ModernDining /></group>
-      <group position={[-25,0,-80]}><ModernBedroom /></group>
-      <group position={[-25,0,-105]}><KidsRoom /></group>
     </Suspense>}
     {(mask & CLASSIC) !== 0 && <Suspense fallback={null}>
       <group position={[25,0,-30]}><NeoClassicLiving /></group>
-      <group position={[25,0,-55]}><NeoClassicDining /></group>
-      <group position={[25,0,-80]}><NeoClassicBedroom /></group>
     </Suspense>}
   </>;
 }

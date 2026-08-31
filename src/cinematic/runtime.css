@@ -4,6 +4,7 @@
   overflow: hidden;
   display: grid;
   place-items: center;
+  z-index: 100;
   background:
     radial-gradient(circle at 50% 34%, rgba(205, 174, 108, .14), transparent 24%),
     linear-gradient(180deg, #101927 0%, #07101b 58%, #030609 100%);

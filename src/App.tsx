@@ -22,9 +22,9 @@ type RoomOption = {
 
 const ROOM_OPTIONS: RoomOption[] = [
   { id: 'living', titleAr: 'المعيشة والصالونات', titleEn: 'Living & Salons', subtitleAr: 'ادخل الغرفة واستكشف القطع والأسعار', subtitleEn: 'Enter the room and explore pieces and prices', enabled: true },
-  { id: 'dining', titleAr: 'غرف السفرة', titleEn: 'Dining Rooms', subtitleAr: 'ادخل صالات السفرة وتعرف على التفاصيل', subtitleEn: 'Enter dining suites and view details', enabled: true },
-  { id: 'bedroom', titleAr: 'غرف النوم', titleEn: 'Bedrooms', subtitleAr: 'أجنحة غرف نوم متكاملة', subtitleEn: 'Complete bedroom suites', enabled: true },
-  { id: 'kids', titleAr: 'الأطفال والشباب', titleEn: 'Kids & Youth', subtitleAr: 'غرف أطفال وشباب', subtitleEn: 'Kids and youth rooms', enabled: true },
+  { id: 'dining', titleAr: 'غرف السفرة', titleEn: 'Dining Rooms', subtitleAr: 'قريبًا — صالات سفرة كاملة داخل القصر', subtitleEn: 'Coming soon — full dining suites inside the palace', enabled: false },
+  { id: 'bedroom', titleAr: 'غرف النوم', titleEn: 'Bedrooms', subtitleAr: 'قريبًا — أجنحة غرف نوم متكاملة', subtitleEn: 'Coming soon — complete bedroom suites', enabled: false },
+  { id: 'kids', titleAr: 'الأطفال والشباب', titleEn: 'Kids & Youth', subtitleAr: 'قريبًا — غرف أطفال وشباب', subtitleEn: 'Coming soon — kids and youth rooms', enabled: false },
 ];
 
 const COPY: Record<Language, any> = {
