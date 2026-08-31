@@ -13,6 +13,12 @@ export interface ProductDefinition {
   materialsEn?: string[];
   colorsAr?: string[];
   colorsEn?: string[];
+  /**
+   * Only populate when the price has been verified by Qubaisa.
+   * Proxy/display products intentionally leave this undefined and render
+   * "Price on request" rather than inventing a commercial price.
+   */
+  priceEgp?: number;
   inquiryEnabled: boolean;
 }
 

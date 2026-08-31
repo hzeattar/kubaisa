@@ -1,0 +1,334 @@
+.palace-directory {
+  margin-top: 34px;
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: min(620px, 92vw);
+}
+
+.palace-directory button,
+.collection-card.is-interactive {
+  appearance: none;
+  text-align: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.palace-directory button {
+  min-height: 88px;
+  padding: 18px 20px;
+  border: 1px solid rgba(224, 196, 134, .28);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(8, 13, 20, .82), rgba(17, 20, 24, .62));
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform .25s ease, border-color .25s ease, background .25s ease;
+}
+
+.palace-directory button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(224, 196, 134, .7);
+  background: linear-gradient(145deg, rgba(22, 24, 26, .9), rgba(31, 26, 20, .75));
+}
+
+.palace-directory button span {
+  color: #d9bc79;
+  font-size: 11px;
+  letter-spacing: .14em;
+}
+
+.palace-directory button strong {
+  font-size: clamp(17px, 2vw, 23px);
+  font-weight: 500;
+}
+
+.interactive-room {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #080b0f;
+  color: #f6f0e7;
+  overflow: hidden;
+}
+
+.interactive-room__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.interactive-room__canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+
+.interactive-room::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3, 5, 8, .62) 0%, transparent 20%, transparent 72%, rgba(3, 4, 6, .56) 100%),
+    radial-gradient(circle at 50% 45%, transparent 48%, rgba(0, 0, 0, .28) 100%);
+}
+
+.interactive-room__topbar {
+  position: absolute;
+  z-index: 110;
+  inset: max(16px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) auto max(18px, env(safe-area-inset-left));
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) auto minmax(130px, 1fr);
+  align-items: center;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.room-back,
+.room-hint {
+  pointer-events: auto;
+}
+
+.room-back {
+  justify-self: start;
+  border: 1px solid rgba(232, 212, 170, .3);
+  background: rgba(8, 11, 15, .62);
+  color: #f5eee4;
+  backdrop-filter: blur(14px);
+  border-radius: 999px;
+  padding: 11px 16px;
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  cursor: pointer;
+}
+
+html[dir='rtl'] .room-back span {
+  transform: rotate(180deg);
+}
+
+.room-title {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, .6);
+}
+
+.room-title span {
+  color: #c9a45d;
+  font-size: 9px;
+  letter-spacing: .15em;
+}
+
+.room-title strong {
+  font-size: clamp(16px, 2vw, 24px);
+  font-weight: 500;
+}
+
+.room-hint {
+  justify-self: end;
+  color: rgba(244, 239, 230, .72);
+  font-size: 11px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(4, 7, 10, .42);
+  backdrop-filter: blur(12px);
+}
+
+.room-viewpoints {
+  position: absolute;
+  z-index: 112;
+  inset: auto 50% max(20px, env(safe-area-inset-bottom)) auto;
+  transform: translateX(50%);
+  display: flex;
+  gap: 8px;
+  padding: 7px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  background: rgba(5, 8, 11, .64);
+  backdrop-filter: blur(18px);
+}
+
+.room-viewpoints button {
+  border: 0;
+  color: rgba(244, 239, 230, .72);
+  background: transparent;
+  border-radius: 13px;
+  min-height: 47px;
+  padding: 8px 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .2s ease, background .2s ease;
+}
+
+.room-viewpoints button span {
+  color: #b9944f;
+  font-size: 9px;
+}
+
+.room-viewpoints button.is-active {
+  color: #fff;
+  background: rgba(202, 169, 97, .16);
+}
+
+.room-price-hotspot {
+  position: relative;
+  border: 1px solid rgba(225, 194, 126, .65);
+  border-radius: 14px;
+  padding: 10px 13px;
+  color: #f8f2e8;
+  background: rgba(7, 9, 11, .78);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  cursor: pointer;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  text-align: start;
+}
+
+.room-price-hotspot span {
+  max-width: 180px;
+  font-size: 10px;
+  color: rgba(245, 239, 229, .7);
+}
+
+.room-price-hotspot strong {
+  font-size: 13px;
+  color: #e2c47d;
+  font-weight: 600;
+}
+
+.room-price-hotspot i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e0bd6c;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 7px rgba(224, 189, 108, .14), 0 0 24px rgba(224, 189, 108, .8);
+}
+
+.room-product-sheet {
+  position: absolute;
+  z-index: 120;
+  inset: auto max(18px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) auto;
+  width: min(410px, calc(100vw - 36px));
+  padding: 28px;
+  border: 1px solid rgba(223, 192, 125, .25);
+  border-radius: 24px;
+  background: rgba(8, 10, 13, .88);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 28px 80px rgba(0,0,0,.45);
+}
+
+.room-product-sheet > span {
+  color: #c7a45d;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+.room-product-sheet h2 {
+  margin: 10px 0 4px;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 500;
+}
+
+.product-sheet-price {
+  display: block;
+  color: #e4c77d;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.room-product-sheet p {
+  color: rgba(245, 239, 229, .68);
+  line-height: 1.75;
+  font-size: 13px;
+}
+
+.product-sheet-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.product-inquiry {
+  width: 100%;
+  margin-top: 8px;
+  padding: 13px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(229, 199, 130, .55);
+  color: #16120c;
+  background: #d4b56e;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-inquiry:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.collection-card.is-interactive {
+  border: 0;
+}
+
+@media (max-width: 760px) {
+  .palace-directory {
+    grid-template-columns: 1fr;
+  }
+
+  .interactive-room__topbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .room-title {
+    order: -1;
+    grid-column: 1 / -1;
+    text-align: start;
+  }
+
+  .room-hint {
+    font-size: 9px;
+  }
+
+  .room-viewpoints {
+    width: calc(100vw - 24px);
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .room-viewpoints button {
+    min-width: max-content;
+  }
+
+  .room-product-sheet {
+    inset-inline: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    border-radius: 20px;
+  }
+
+  .room-price-hotspot {
+    transform: scale(.88);
+  }
+}
