@@ -1,11 +1,14 @@
-import React from 'react';
-import { Environment } from '@react-three/drei';
+import React, { useRef } from 'react';
+import { Sky } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { Pillar, Window } from '../components/3d/Architectural';
 import {
   useMarbleTexture,
   useMetalTexture,
   usePlasterTexture,
 } from '../components/3d/Materials';
+import { cinematicScroll } from './scrollState';
 
 const Wing: React.FC<{ x: number; mirror?: boolean }> = ({ x, mirror = false }) => {
   const plaster = usePlasterTexture();
@@ -70,6 +73,62 @@ const Tree: React.FC<{ position: [number, number, number]; scale?: number }> = (
   </group>
 );
 
+function EntranceDoors() {
+  const leftDoor = useRef<THREE.Group>(null);
+  const rightDoor = useRef<THREE.Group>(null);
+  const metal = useMetalTexture();
+
+  useFrame(() => {
+    const openness = THREE.MathUtils.smoothstep(cinematicScroll.progress, 0.3, 0.47);
+    if (leftDoor.current) leftDoor.current.position.x = -1.02 - openness * 1.62;
+    if (rightDoor.current) rightDoor.current.position.x = 1.02 + openness * 1.62;
+  });
+
+  const DoorLeaf = ({ side }: { side: -1 | 1 }) => (
+    <group ref={side === -1 ? leftDoor : rightDoor} position={[side * 1.02, 0, 0]}>
+      <mesh position={[0, 3.08, 0.37]} castShadow receiveShadow>
+        <boxGeometry args={[1.92, 5.75, 0.11]} />
+        <meshPhysicalMaterial
+          color="#17242c"
+          roughness={0.08}
+          metalness={0.12}
+          transparent
+          opacity={0.5}
+          transmission={0.18}
+          thickness={0.05}
+        />
+      </mesh>
+      <mesh position={[side * -0.82, 3.08, 0.44]} castShadow>
+        <boxGeometry args={[0.065, 5.72, 0.08]} />
+        <meshStandardMaterial {...metal} color="#b99452" metalness={0.9} roughness={0.3} />
+      </mesh>
+      <mesh position={[side * -0.68, 2.9, 0.5]} castShadow>
+        <boxGeometry args={[0.045, 1.2, 0.09]} />
+        <meshStandardMaterial {...metal} color="#cfac65" metalness={0.94} roughness={0.24} />
+      </mesh>
+    </group>
+  );
+
+  return (
+    <group>
+      <mesh position={[-3.08, 3.08, 0.35]} castShadow receiveShadow>
+        <boxGeometry args={[1.72, 5.75, 0.09]} />
+        <meshPhysicalMaterial color="#16232b" roughness={0.1} metalness={0.14} transparent opacity={0.42} />
+      </mesh>
+      <mesh position={[3.08, 3.08, 0.35]} castShadow receiveShadow>
+        <boxGeometry args={[1.72, 5.75, 0.09]} />
+        <meshPhysicalMaterial color="#16232b" roughness={0.1} metalness={0.14} transparent opacity={0.42} />
+      </mesh>
+      <DoorLeaf side={-1} />
+      <DoorLeaf side={1} />
+      <mesh position={[0, 0.2, 0.46]} castShadow receiveShadow>
+        <boxGeometry args={[7.8, 0.16, 0.46]} />
+        <meshStandardMaterial {...metal} color="#9d7d42" metalness={0.88} roughness={0.34} />
+      </mesh>
+    </group>
+  );
+}
+
 export const CinematicExterior: React.FC = () => {
   const plaster = usePlasterTexture();
   const marble = useMarbleTexture();
@@ -77,7 +136,14 @@ export const CinematicExterior: React.FC = () => {
 
   return (
     <group>
-      <Environment files="/hdri/venice_sunset_1k.hdr" background blur={0.12} />
+      <Sky
+        distance={450000}
+        sunPosition={[4, 1.1, -3]}
+        turbidity={7.2}
+        rayleigh={1.35}
+        mieCoefficient={0.008}
+        mieDirectionalG={0.86}
+      />
 
       <mesh position={[0, -0.08, -4]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[130, 95]} />
@@ -111,14 +177,7 @@ export const CinematicExterior: React.FC = () => {
         </mesh>
 
         <group position={[0, 0, 2.55]}>
-          <mesh position={[-2.12, 3.1, 0.32]} castShadow receiveShadow>
-            <boxGeometry args={[4.1, 5.8, 0.1]} />
-            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transparent opacity={0.68} />
-          </mesh>
-          <mesh position={[2.12, 3.1, 0.32]} castShadow receiveShadow>
-            <boxGeometry args={[4.1, 5.8, 0.1]} />
-            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transparent opacity={0.68} />
-          </mesh>
+          <EntranceDoors />
           <mesh position={[0, 6.85, -0.02]} castShadow receiveShadow>
             <boxGeometry args={[12.8, 0.7, 1.55]} />
             <meshStandardMaterial {...marble} color="#e6ded1" roughness={0.46} />
@@ -137,6 +196,9 @@ export const CinematicExterior: React.FC = () => {
           </mesh>
         </group>
       </group>
+
+      <pointLight position={[0, 3.8, -14.9]} intensity={14} distance={15} decay={2} color="#ffd5a0" />
+      <pointLight position={[0, 2.4, -10.7]} intensity={5} distance={9} decay={2} color="#f4c985" />
 
       <Wing x={-16.7} />
       <Wing x={16.7} mirror />
