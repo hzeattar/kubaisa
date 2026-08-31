@@ -41,9 +41,56 @@ export const Window: React.FC<{
   width?: number;
   height?: number;
   arched?: boolean;
-}> = ({ position, width = 2, height = 4 }) => {
+}> = ({ position, width = 2, height = 4, arched = false }) => {
   const metal = useMetalTexture();
   const plaster = usePlasterTexture();
+
+  if (arched) {
+    const radius = width / 2;
+    const rectHeight = Math.max(0.8, height - radius);
+    const archCenterY = rectHeight / 2;
+    const rectCenterY = -radius / 2;
+
+    return (
+      <group position={position}>
+        <mesh position={[0, 0, -0.12]} castShadow receiveShadow>
+          <boxGeometry args={[width + 0.68, height + 0.56, 0.42]} />
+          <meshStandardMaterial {...plaster} color="#ddd6cb" roughness={0.7} />
+        </mesh>
+
+        <mesh position={[0, rectCenterY, 0.055]} castShadow receiveShadow>
+          <boxGeometry args={[width + 0.16, rectHeight + 0.12, 0.1]} />
+          <meshStandardMaterial {...metal} color="#24201c" roughness={0.46} metalness={0.78} />
+        </mesh>
+        <mesh position={[0, rectCenterY, 0.09]}>
+          <planeGeometry args={[width, rectHeight]} />
+          <meshStandardMaterial color="#071019" roughness={0.14} metalness={0.5} transparent opacity={0.9} />
+        </mesh>
+
+        <mesh position={[0, archCenterY, 0.09]}>
+          <circleGeometry args={[radius, 40, 0, Math.PI]} />
+          <meshStandardMaterial color="#071019" roughness={0.14} metalness={0.5} transparent opacity={0.9} side={2} />
+        </mesh>
+        <mesh position={[0, archCenterY, 0.12]} castShadow>
+          <torusGeometry args={[radius + 0.09, 0.09, 12, 48, Math.PI]} />
+          <meshStandardMaterial {...metal} color="#9f7e44" roughness={0.36} metalness={0.86} />
+        </mesh>
+
+        <mesh position={[0, rectCenterY, 0.13]} castShadow>
+          <boxGeometry args={[0.055, rectHeight, 0.1]} />
+          <meshStandardMaterial color="#26211d" roughness={0.5} metalness={0.82} />
+        </mesh>
+        <mesh position={[0, rectCenterY + rectHeight * 0.18, 0.13]} castShadow>
+          <boxGeometry args={[width, 0.05, 0.1]} />
+          <meshStandardMaterial color="#26211d" roughness={0.5} metalness={0.82} />
+        </mesh>
+        <mesh position={[0, rectCenterY - rectHeight * 0.22, 0.13]} castShadow>
+          <boxGeometry args={[width, 0.05, 0.1]} />
+          <meshStandardMaterial color="#26211d" roughness={0.5} metalness={0.82} />
+        </mesh>
+      </group>
+    );
+  }
 
   return (
     <group position={position}>
@@ -69,7 +116,7 @@ export const Window: React.FC<{
       </mesh>
       <mesh position={[0, 0, 0.1]}>
         <planeGeometry args={[width, height]} />
-        <meshStandardMaterial color="#02050a" roughness={0.1} metalness={0.9} envMapIntensity={2} transparent opacity={0.85} />
+        <meshStandardMaterial color="#02050a" roughness={0.1} metalness={0.9} transparent opacity={0.85} />
       </mesh>
     </group>
   );
