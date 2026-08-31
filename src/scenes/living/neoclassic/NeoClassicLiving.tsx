@@ -1,12 +1,20 @@
 import React from 'react';
 import { RoundedBox } from '@react-three/drei';
 import { Window } from '../../../components/3d/Architectural';
-import { useSharedTextures } from '../../../components/3d/Materials';
+import {
+  useClassicFabricTexture,
+  useClassicRoomTextures,
+  useMarbleTexture,
+  useMetalTexture,
+  useWoodTexture,
+} from '../../../components/3d/Materials';
 
 type ClassicSeatProps = { position: [number, number, number]; rotationY?: number; width?: number; accent?: string };
 
 const ClassicSeat: React.FC<ClassicSeatProps> = ({ position, rotationY = 0, width = 3.8, accent = '#d8c8b8' }) => {
-  const { fabricClassic, wood, metal } = useSharedTextures();
+  const fabricClassic = useClassicFabricTexture();
+  const wood = useWoodTexture();
+  const metal = useMetalTexture();
   const halfWidth = width / 2;
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
@@ -22,7 +30,8 @@ const ClassicSeat: React.FC<ClassicSeatProps> = ({ position, rotationY = 0, widt
 };
 
 const ClassicCoffeeTable = () => {
-  const { marble, metal } = useSharedTextures();
+  const marble = useMarbleTexture();
+  const metal = useMetalTexture();
   return (
     <group position={[0, 0, 0.7]}>
       <RoundedBox args={[2.8, 0.13, 1.65]} radius={0.2} smoothness={4} position={[0, 0.62, 0]} castShadow receiveShadow><meshStandardMaterial {...marble} color="#f0e7db" roughness={0.15} metalness={0.03} /></RoundedBox>
@@ -33,7 +42,7 @@ const ClassicCoffeeTable = () => {
 };
 
 export const NeoClassicLiving: React.FC = () => {
-  const { wood, plaster, marble, metal } = useSharedTextures();
+  const { wood, plaster, marble, metal } = useClassicRoomTextures();
   return (
     <group>
       <rectAreaLight position={[0, 5.8, 1]} rotation={[-Math.PI / 2, 0, 0]} width={9} height={7} intensity={3.8} color="#ffe0b5" />
