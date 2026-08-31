@@ -134,7 +134,9 @@ function RoomScene({
 export function InteractiveRoomExperience({ room, language, onClose }: Props) {
   const [viewIndex, setViewIndex] = useState(0);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const lastWheelAt = useRef(0);
+  const closeTimer = useRef<number | null>(null);
   const pointerStart = useRef<{ id: number; x: number; y: number } | null>(null);
   const key = `${room.department}-${room.room}`;
   const views = ROOM_VIEWS[key] || ROOM_VIEWS['modern-living'];
@@ -144,8 +146,25 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
     : room.department === 'modern' ? 'Modern Living' : 'Neo-Classical Salon';
 
   const moveView = (direction: 1 | -1) => {
-    if (selectedProductId) return;
+    if (selectedProductId || isClosing) return;
     setViewIndex((current) => THREE.MathUtils.clamp(current + direction, 0, views.length - 1));
+  };
+
+  const requestClose = () => {
+    if (isClosing) return;
+    const reducedMotion = typeof window !== 'undefined'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reducedMotion) {
+      onClose();
+      return;
+    }
+
+    setIsClosing(true);
+    closeTimer.current = window.setTimeout(() => {
+      closeTimer.current = null;
+      onClose();
+    }, 340);
   };
 
   useEffect(() => {
@@ -154,9 +173,14 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
     return () => { document.body.style.overflow = previous; };
   }, []);
 
+  useEffect(() => () => {
+    if (closeTimer.current !== null) window.clearTimeout(closeTimer.current);
+  }, []);
+
   useEffect(() => {
     setViewIndex(0);
     setSelectedProductId(null);
+    setIsClosing(false);
   }, [room]);
 
   useEffect(() => {
@@ -169,14 +193,14 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
         event.preventDefault();
         moveView(-1);
       }
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') requestClose();
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   });
 
   const handleWheel = (event: React.WheelEvent<HTMLElement>) => {
-    if (Math.abs(event.deltaY) < 18 || selectedProductId) return;
+    if (Math.abs(event.deltaY) < 18 || selectedProductId || isClosing) return;
     const now = performance.now();
     if (now - lastWheelAt.current < 620) return;
     lastWheelAt.current = now;
@@ -184,14 +208,14 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLElement>) => {
-    if (event.pointerType !== 'touch') return;
+    if (event.pointerType !== 'touch' || isClosing) return;
     pointerStart.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
   };
 
   const handlePointerUp = (event: React.PointerEvent<HTMLElement>) => {
     const start = pointerStart.current;
     pointerStart.current = null;
-    if (!start || start.id !== event.pointerId || selectedProductId) return;
+    if (!start || start.id !== event.pointerId || selectedProductId || isClosing) return;
 
     const dx = event.clientX - start.x;
     const dy = event.clientY - start.y;
@@ -210,15 +234,21 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
 
   return (
     <section
-      className="interactive-room"
+      className={`interactive-room ${isClosing ? 'is-closing' : ''}`}
       aria-label={roomTitle}
       onWheel={handleWheel}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerCancel={() => { pointerStart.current = null; }}
     >
+      <div className="room-entry-veil" aria-hidden="true">
+        <span>QUBAISA FURNITURE</span>
+        <strong>{roomTitle}</strong>
+        <i />
+      </div>
+
       <div className="interactive-room__topbar">
-        <button type="button" className="room-back" onClick={onClose}>
+        <button type="button" className="room-back" onClick={requestClose}>
           <span aria-hidden="true">←</span>{language === 'ar' ? 'العودة للهول' : 'Back to hall'}
         </button>
         <div className="room-title">
