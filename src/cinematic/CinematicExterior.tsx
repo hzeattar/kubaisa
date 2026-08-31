@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Sky } from '@react-three/drei';
+import { Instance, Instances, Sky } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Pillar, Window } from '../components/3d/Architectural';
@@ -28,11 +28,17 @@ const Wing: React.FC<{ x: number; mirror?: boolean }> = ({ x, mirror = false }) 
       </mesh>
       <mesh position={[sign * 1.1, 12.05, 0.3]} castShadow receiveShadow>
         <boxGeometry args={[18.4, 0.52, 4.15]} />
-        <meshStandardMaterial {...marble} color="#ddd4c6" roughness={0.48} />
+        <meshPhysicalMaterial
+          {...marble}
+          color="#ddd4c6"
+          roughness={0.4}
+          clearcoat={0.06}
+          clearcoatRoughness={0.55}
+        />
       </mesh>
       <mesh position={[sign * 1.1, 6.35, 0.38]} castShadow receiveShadow>
         <boxGeometry args={[18.1, 0.34, 4]} />
-        <meshStandardMaterial {...marble} color="#d6ccbd" roughness={0.5} />
+        <meshPhysicalMaterial {...marble} color="#d6ccbd" roughness={0.44} clearcoat={0.05} />
       </mesh>
 
       {[-5.2, 0, 5.2].map((localX) => (
@@ -93,9 +99,10 @@ function EntranceDoors() {
           roughness={0.08}
           metalness={0.12}
           transparent
-          opacity={0.5}
-          transmission={0.18}
-          thickness={0.05}
+          opacity={0.46}
+          transmission={0.2}
+          thickness={0.06}
+          ior={1.45}
         />
       </mesh>
       <mesh position={[side * -0.82, 3.08, 0.44]} castShadow>
@@ -113,11 +120,11 @@ function EntranceDoors() {
     <group>
       <mesh position={[-3.08, 3.08, 0.35]} castShadow receiveShadow>
         <boxGeometry args={[1.72, 5.75, 0.09]} />
-        <meshPhysicalMaterial color="#16232b" roughness={0.1} metalness={0.14} transparent opacity={0.42} />
+        <meshPhysicalMaterial color="#16232b" roughness={0.1} metalness={0.14} transparent opacity={0.4} />
       </mesh>
       <mesh position={[3.08, 3.08, 0.35]} castShadow receiveShadow>
         <boxGeometry args={[1.72, 5.75, 0.09]} />
-        <meshPhysicalMaterial color="#16232b" roughness={0.1} metalness={0.14} transparent opacity={0.42} />
+        <meshPhysicalMaterial color="#16232b" roughness={0.1} metalness={0.14} transparent opacity={0.4} />
       </mesh>
       <DoorLeaf side={-1} />
       <DoorLeaf side={1} />
@@ -125,6 +132,25 @@ function EntranceDoors() {
         <boxGeometry args={[7.8, 0.16, 0.46]} />
         <meshStandardMaterial {...metal} color="#9d7d42" metalness={0.88} roughness={0.34} />
       </mesh>
+    </group>
+  );
+}
+
+function ArrivalBollards() {
+  const xs = [-12, -8, -4, 4, 8, 12];
+
+  return (
+    <group position={[0, 0, 12]}>
+      <Instances limit={xs.length} castShadow>
+        <cylinderGeometry args={[0.07, 0.1, 0.9, 12]} />
+        <meshStandardMaterial color="#282725" metalness={0.72} roughness={0.38} />
+        {xs.map((x) => <Instance key={`post-${x}`} position={[x, 0.45, 0]} />)}
+      </Instances>
+      <Instances limit={xs.length}>
+        <sphereGeometry args={[0.095, 12, 10]} />
+        <meshStandardMaterial color="#ffe0a8" emissive="#e8a84d" emissiveIntensity={3.2} toneMapped={false} />
+        {xs.map((x) => <Instance key={`lamp-${x}`} position={[x, 0.96, 0]} />)}
+      </Instances>
     </group>
   );
 }
@@ -151,7 +177,7 @@ export const CinematicExterior: React.FC = () => {
       </mesh>
       <mesh position={[0, -0.02, -4]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[54, 34]} />
-        <meshStandardMaterial {...marble} color="#777064" roughness={0.78} />
+        <meshPhysicalMaterial {...marble} color="#777064" roughness={0.68} clearcoat={0.04} />
       </mesh>
 
       <group position={[0, 0, -14]}>
@@ -169,7 +195,7 @@ export const CinematicExterior: React.FC = () => {
         </mesh>
         <mesh position={[0, 11.65, -0.2]} castShadow receiveShadow>
           <boxGeometry args={[20.4, 1.35, 5.15]} />
-          <meshStandardMaterial {...marble} color="#d9d0c2" roughness={0.48} />
+          <meshPhysicalMaterial {...marble} color="#d9d0c2" roughness={0.4} clearcoat={0.06} />
         </mesh>
         <mesh position={[0, 13.2, -0.3]} castShadow receiveShadow>
           <boxGeometry args={[16.4, 1.45, 4.45]} />
@@ -180,7 +206,7 @@ export const CinematicExterior: React.FC = () => {
           <EntranceDoors />
           <mesh position={[0, 6.85, -0.02]} castShadow receiveShadow>
             <boxGeometry args={[12.8, 0.7, 1.55]} />
-            <meshStandardMaterial {...marble} color="#e6ded1" roughness={0.46} />
+            <meshPhysicalMaterial {...marble} color="#e6ded1" roughness={0.38} clearcoat={0.05} />
           </mesh>
           <Pillar position={[-5.1, 3.55, -0.05]} height={7.1} radius={0.43} />
           <Pillar position={[5.1, 3.55, -0.05]} height={7.1} radius={0.43} />
@@ -197,8 +223,8 @@ export const CinematicExterior: React.FC = () => {
         </group>
       </group>
 
-      <pointLight position={[0, 3.8, -14.9]} intensity={14} distance={15} decay={2} color="#ffd5a0" />
-      <pointLight position={[0, 2.4, -10.7]} intensity={5} distance={9} decay={2} color="#f4c985" />
+      {/* One interior glow is enough to sell the doorway depth; facade wash lives in FacadeDetails. */}
+      <pointLight position={[0, 3.8, -14.9]} intensity={11} distance={14} decay={2} color="#ffd5a0" />
 
       <Wing x={-16.7} />
       <Wing x={16.7} mirror />
@@ -206,22 +232,30 @@ export const CinematicExterior: React.FC = () => {
       {[0, 1, 2, 3].map((step) => (
         <mesh key={step} position={[0, 0.1 + step * 0.13, -9.25 - step * 0.72]} castShadow receiveShadow>
           <boxGeometry args={[15.5 - step * 0.65, 0.2, 0.72]} />
-          <meshStandardMaterial {...marble} color="#cfc6b8" roughness={0.42} />
+          <meshPhysicalMaterial {...marble} color="#cfc6b8" roughness={0.36} clearcoat={0.04} />
         </mesh>
       ))}
 
       <group position={[0, 0, 6.5]}>
         <mesh position={[0, 0.14, 0]} receiveShadow>
           <cylinderGeometry args={[6.4, 6.4, 0.28, 64]} />
-          <meshStandardMaterial {...marble} color="#6b655d" roughness={0.58} />
+          <meshPhysicalMaterial {...marble} color="#6b655d" roughness={0.5} clearcoat={0.04} />
         </mesh>
         <mesh position={[0, 0.29, 0]}>
           <cylinderGeometry args={[5.45, 5.45, 0.12, 64]} />
-          <meshPhysicalMaterial color="#23323b" roughness={0.08} metalness={0.18} transparent opacity={0.82} />
+          <meshPhysicalMaterial
+            color="#23323b"
+            roughness={0.06}
+            metalness={0.08}
+            transparent
+            opacity={0.8}
+            clearcoat={0.55}
+            clearcoatRoughness={0.18}
+          />
         </mesh>
         <mesh position={[0, 0.52, 0]} castShadow>
           <cylinderGeometry args={[0.82, 1.12, 0.6, 40]} />
-          <meshStandardMaterial {...marble} color="#bbb1a3" roughness={0.42} />
+          <meshPhysicalMaterial {...marble} color="#bbb1a3" roughness={0.34} clearcoat={0.06} />
         </mesh>
       </group>
 
@@ -229,15 +263,7 @@ export const CinematicExterior: React.FC = () => {
         <Tree key={i} position={p} scale={i % 2 === 0 ? 1.05 : 0.86} />
       ))}
 
-      {[-12, -8, -4, 4, 8, 12].map((x) => (
-        <group key={x} position={[x, 0, 12]}>
-          <mesh position={[0, 0.45, 0]} castShadow>
-            <cylinderGeometry args={[0.07, 0.1, 0.9, 12]} />
-            <meshStandardMaterial color="#282725" metalness={0.7} roughness={0.42} />
-          </mesh>
-          <pointLight position={[0, 0.95, 0]} intensity={1.4} distance={4.2} color="#ffd89a" />
-        </group>
-      ))}
+      <ArrivalBollards />
     </group>
   );
 };
