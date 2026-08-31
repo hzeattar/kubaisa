@@ -1,10 +1,10 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
 import { CameraControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
 import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
 import { products } from '../data/products';
+import { AdaptiveRoomCanvas } from './AdaptiveRoomCanvas';
 
 export type InteractiveRoom = {
   department: 'modern' | 'classic';
@@ -114,9 +114,17 @@ function RoomScene({
   return (
     <>
       <color attach="background" args={[classic ? '#17120e' : '#151413']} />
-      <ambientLight intensity={0.32} color="#ffe8ca" />
-      <hemisphereLight args={['#fff0da', '#1b1510', 0.54]} />
-      <directionalLight position={[8, 13, 9]} intensity={1.2} color="#ffe2b6" castShadow shadow-mapSize={[1024, 1024]} />
+      <ambientLight intensity={0.25} color="#ffe8ca" />
+      <hemisphereLight args={['#fff0da', '#1b1510', 0.46]} />
+      <directionalLight
+        position={[8, 13, 9]}
+        intensity={1.08}
+        color="#ffe2b6"
+        castShadow
+        shadow-bias={-0.00035}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
       <SceneComponent />
       <PriceHotspot productId={productId} position={hotspotPos} language={language} onOpen={onOpenProduct} />
     </>
@@ -223,21 +231,12 @@ export function InteractiveRoomExperience({ room, language, onClose }: Props) {
       </div>
 
       <div className="interactive-room__canvas">
-        <Canvas
-          shadows
-          dpr={[1, 1.4]}
-          camera={{ position: views[0].position, fov: 47, near: 0.1, far: 80 }}
-          gl={{ antialias: true, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping }}
-          onCreated={({ gl }) => {
-            gl.toneMappingExposure = 0.98;
-            gl.outputColorSpace = THREE.SRGBColorSpace;
-          }}
-        >
+        <AdaptiveRoomCanvas cameraPosition={views[0].position}>
           <Suspense fallback={null}>
             <RoomCamera room={room} viewIndex={viewIndex} />
             <RoomScene room={room} language={language} onOpenProduct={setSelectedProductId} />
           </Suspense>
-        </Canvas>
+        </AdaptiveRoomCanvas>
       </div>
 
       <nav className="room-viewpoints" aria-label={language === 'ar' ? 'نقاط التجول داخل الغرفة' : 'Room viewpoints'}>
