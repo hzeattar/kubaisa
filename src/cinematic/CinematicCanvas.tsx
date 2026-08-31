@@ -27,10 +27,10 @@ const TARGET_POINTS = [
   new THREE.Vector3(0, 4.5, -14),
   new THREE.Vector3(0, 3.5, -20),
   new THREE.Vector3(0, 2.5, -28),
-  new THREE.Vector3(-24, 2.0, -25),
+  new THREE.Vector3(-24, 2, -25),
   new THREE.Vector3(-25, 1.4, -28),
-  new THREE.Vector3(0, 2.0, -28),
-  new THREE.Vector3(24, 2.0, -25),
+  new THREE.Vector3(0, 2, -28),
+  new THREE.Vector3(24, 2, -25),
   new THREE.Vector3(25, 1.4, -28),
 ] as const;
 
@@ -116,10 +116,10 @@ export function CinematicCanvas() {
         antialias: true,
         powerPreference: 'high-performance',
         toneMapping: THREE.ACESFilmicToneMapping,
-        outputColorSpace: THREE.SRGBColorSpace,
       }}
       onCreated={({ gl }) => {
         gl.toneMappingExposure = 0.92;
+        gl.outputColorSpace = THREE.SRGBColorSpace;
       }}
       fallback={<div className="cinematic-webgl-fallback" />}
     >
