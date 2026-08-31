@@ -1,7 +1,7 @@
 {
-  "name": "react-example",
+  "name": "qubaisa-cinematic-showroom",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -10,8 +10,9 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "start": "node server.js"
   },
   "dependencies": {
