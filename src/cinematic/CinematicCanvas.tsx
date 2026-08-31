@@ -1,6 +1,7 @@
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import * as THREE from 'three';
 import { cinematicScroll } from './scrollState';
 import { BrandFacadeSign } from './BrandFacadeSign';
@@ -118,6 +119,27 @@ function getSceneMask(progress: number, department: Department | null) {
   return mask || LOBBY;
 }
 
+function LocalPbrEnvironment() {
+  const { gl, scene } = useThree();
+
+  useEffect(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const environment = pmrem.fromScene(room, 0.035).texture;
+
+    scene.environment = environment;
+
+    return () => {
+      if (scene.environment === environment) scene.environment = null;
+      environment.dispose();
+      room.clear();
+      pmrem.dispose();
+    };
+  }, [gl, scene]);
+
+  return null;
+}
+
 function CinematicCamera({ department }: { department: Department | null }) {
   const { camera } = useThree();
   const cameraCurve = useMemo(
@@ -199,6 +221,7 @@ function CinematicWorld({ department, quality }: { department: Department | null
     <>
       <color attach="background" args={['#07101b']} />
       <fog attach="fog" args={['#07101b', 58, 138]} />
+      <LocalPbrEnvironment />
       <CinematicCamera department={department} />
       <ambientLight intensity={0.2} color="#ffe8cb" />
       <hemisphereLight args={['#fff0d8', '#17110c', 0.44]} />
