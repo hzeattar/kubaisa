@@ -22,9 +22,9 @@ type RoomOption = {
 
 const ROOM_OPTIONS: RoomOption[] = [
   { id: 'living', titleAr: 'المعيشة والصالونات', titleEn: 'Living & Salons', subtitleAr: 'ادخل الغرفة واستكشف القطع والأسعار', subtitleEn: 'Enter the room and explore pieces and prices', enabled: true },
-  { id: 'dining', titleAr: 'غرف السفرة', titleEn: 'Dining Rooms', subtitleAr: 'قريبًا — صالات سفرة كاملة داخل القصر', subtitleEn: 'Coming soon — full dining suites inside the palace', enabled: false },
-  { id: 'bedroom', titleAr: 'غرف النوم', titleEn: 'Bedrooms', subtitleAr: 'قريبًا — أجنحة غرف نوم متكاملة', subtitleEn: 'Coming soon — complete bedroom suites', enabled: false },
-  { id: 'kids', titleAr: 'الأطفال والشباب', titleEn: 'Kids & Youth', subtitleAr: 'قريبًا — غرف أطفال وشباب', subtitleEn: 'Coming soon — kids and youth rooms', enabled: false },
+  { id: 'dining', titleAr: 'غرف السفرة', titleEn: 'Dining Rooms', subtitleAr: 'ادخل صالات السفرة وتعرف على التفاصيل', subtitleEn: 'Enter dining suites and view details', enabled: true },
+  { id: 'bedroom', titleAr: 'غرف النوم', titleEn: 'Bedrooms', subtitleAr: 'أجنحة غرف نوم متكاملة', subtitleEn: 'Complete bedroom suites', enabled: true },
+  { id: 'kids', titleAr: 'الأطفال والشباب', titleEn: 'Kids & Youth', subtitleAr: 'غرف أطفال وشباب', subtitleEn: 'Kids and youth rooms', enabled: true },
 ];
 
 const COPY: Record<Language, any> = {
@@ -54,7 +54,7 @@ export default function App() {
   const language = useAppStore((state) => state.language) as Language;
   const setLanguage = useAppStore((state) => state.setLanguage);
   const [department, setDepartment] = useState<Department | null>(null);
-  const [interactiveRoom, setInteractiveRoom] = useState<InteractiveRoom | null>(null);
+  const [interactiveRoom, setInteractiveRoom] = useState<{ department: Department; room: RoomKey } | null>(null);
   const copy = COPY[language];
 
   useEffect(() => {
@@ -89,8 +89,8 @@ export default function App() {
   };
 
   const enterRoom = (room: RoomKey) => {
-    if (room !== 'living' || !department) return;
-    setInteractiveRoom(department === 'modern' ? 'modern' : 'classic');
+    if (!department) return;
+    setInteractiveRoom({ department, room });
   };
 
   const hallCopy = department === 'classic' ? copy.classicHall : copy.modernHall;
@@ -114,9 +114,9 @@ export default function App() {
 
       <section id="gate" className="story-chapter journey-gate">
         <div className="journey-gate__copy"><Chapter copy={copy.gate} align={language === 'ar' ? 'right' : 'left'} /><span className="journey-step-label">02 — {copy.chooseDepartment}</span></div>
-        <div className="department-choice" role="group" aria-label={copy.chooseDepartment}>
-          <button type="button" className={department === 'modern' ? 'is-selected' : ''} onClick={() => selectDepartment('modern')}><span>01</span><strong>{copy.modern}</strong><small>{copy.modernHint}</small><i aria-hidden="true">→</i></button>
-          <button type="button" className={department === 'classic' ? 'is-selected' : ''} onClick={() => selectDepartment('classic')}><span>02</span><strong>{copy.classic}</strong><small>{copy.classicHint}</small><i aria-hidden="true">→</i></button>
+        <div className="department-choice" role="group" aria-label={copy.chooseDepartment} style={{ direction: 'ltr' }}>
+          <button type="button" className={department === 'modern' ? 'is-selected' : ''} onClick={() => selectDepartment('modern')} dir={language === 'ar' ? 'rtl' : 'ltr'}><span>01</span><strong>{copy.modern}</strong><small>{copy.modernHint}</small><i aria-hidden="true">→</i></button>
+          <button type="button" className={department === 'classic' ? 'is-selected' : ''} onClick={() => selectDepartment('classic')} dir={language === 'ar' ? 'rtl' : 'ltr'}><span>02</span><strong>{copy.classic}</strong><small>{copy.classicHint}</small><i aria-hidden="true">→</i></button>
         </div>
       </section>
 

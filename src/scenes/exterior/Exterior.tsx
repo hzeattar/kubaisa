@@ -9,7 +9,7 @@ export const Exterior: React.FC = () => {
   return (
     <group>
       {/* Environment HDRI for real lighting and reflections */}
-      <Environment files="/hdri/sunset.hdr" background={true} blur={0.05} />
+      <Environment preset="sunset" background={true} blur={0.05} />
 
       {/* Ground / Driveway */}
       <mesh position={[0, -0.05, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>

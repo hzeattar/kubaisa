@@ -111,13 +111,69 @@ export function CinematicLobby() {
       </mesh>
 
       {[-1, 1].map((side) => (
-        <group key={side} position={[side * 14.5, 0, -19.5]}>
-          <mesh position={[0, 4.6, 0]} receiveShadow>
-            <boxGeometry args={[0.65, 9.2, 42]} />
+        <group key={side} position={[side * 14.5, 0, 0]}>
+          <mesh position={[0, 4.6, -8.75]} receiveShadow>
+            <boxGeometry args={[0.65, 9.2, 21.5]} />
             <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
           </mesh>
-          {[-31, -23, -15, -7].map((z) => (
-            <group key={z} position={[side * -0.4, 0, z + 19.5]}>
+          <mesh position={[0, 4.6, -34.75]} receiveShadow>
+            <boxGeometry args={[0.65, 9.2, 10.5]} />
+            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
+          </mesh>
+          <mesh position={[0, 8.2, -24.5]} receiveShadow>
+            <boxGeometry args={[0.65, 2.0, 10]} />
+            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
+          </mesh>
+          <mesh position={[side * 15, -0.08, -24.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <planeGeometry args={[30, 10]} />
+            <meshStandardMaterial {...marble} color="#d8d0c5" roughness={0.3} />
+          </mesh>
+          <mesh position={[side * 15, 9.2, -24.5]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+            <planeGeometry args={[30, 10]} />
+            <meshStandardMaterial {...plaster} color={stone} roughness={0.78} side={2} />
+          </mesh>
+          <mesh position={[side * 22.5, 4.6, -19.5]} receiveShadow>
+            <boxGeometry args={[15, 9.2, 0.65]} />
+            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
+          </mesh>
+          <mesh position={[side * 17.5, 4.6, -29.5]} receiveShadow>
+            <boxGeometry args={[5, 9.2, 0.65]} />
+            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
+          </mesh>
+          <group position={[side * 22, 0, -29.5]}>
+             <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
+               <boxGeometry args={[3.2, 7, 0.8]} />
+               <meshStandardMaterial color="#1f1a16" roughness={0.8} />
+             </mesh>
+             <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
+               <boxGeometry args={[3.6, 7.4, 0.2]} />
+               <meshStandardMaterial {...marble} color="#e6dfd1" roughness={0.3} />
+             </mesh>
+          </group>
+          <group position={[side * 27, 0, -29.5]}>
+             <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
+               <boxGeometry args={[3.2, 7, 0.8]} />
+               <meshStandardMaterial color="#1f1a16" roughness={0.8} />
+             </mesh>
+             <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
+               <boxGeometry args={[3.6, 7.4, 0.2]} />
+               <meshStandardMaterial {...marble} color="#e6dfd1" roughness={0.3} />
+             </mesh>
+          </group>
+          {[-7, -15].map((z) => (
+            <group key={z} position={[side * -0.4, 0, z]}>
+              <mesh position={[0, 3.9, 0]} castShadow receiveShadow>
+                <boxGeometry args={[0.24, 5.9, 5.4]} />
+                <meshStandardMaterial {...plaster} color="#f5efe7" roughness={0.66} />
+              </mesh>
+              <mesh position={[side * -0.15, 3.9, 0]}>
+                <boxGeometry args={[0.12, 4.7, 4.2]} />
+                <meshStandardMaterial color="#18212a" roughness={0.32} metalness={0.2} />
+              </mesh>
+            </group>
+          ))}
+          {[-31, -39].map((z) => (
+            <group key={z} position={[side * -0.4, 0, z]}>
               <mesh position={[0, 3.9, 0]} castShadow receiveShadow>
                 <boxGeometry args={[0.24, 5.9, 5.4]} />
                 <meshStandardMaterial {...plaster} color="#f5efe7" roughness={0.66} />

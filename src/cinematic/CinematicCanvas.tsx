@@ -3,6 +3,11 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
 import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
+import { ModernDining } from '../scenes/dining/modern/ModernDining';
+import { NeoClassicDining } from '../scenes/dining/neoclassic/NeoClassicDining';
+import { ModernBedroom } from '../scenes/bedroom/modern/ModernBedroom';
+import { NeoClassicBedroom } from '../scenes/bedroom/neoclassic/NeoClassicBedroom';
+import { KidsRoom } from '../scenes/kids/KidsRoom';
 import { cinematicScroll } from './scrollState';
 import { BrandFacadeSign } from './BrandFacadeSign';
 import { CinematicExterior } from './CinematicExterior';
@@ -23,8 +28,8 @@ function cameraPoints(department: Department | null) {
     new THREE.Vector3(0, 2.2, -8),
     new THREE.Vector3(0, 2.15, -18),
   ];
-  if (department === 'modern') return [...common, new THREE.Vector3(-8,2.3,-19), new THREE.Vector3(-17,2.25,-21), new THREE.Vector3(-23,2.15,-23), new THREE.Vector3(-25,1.9,-26)];
-  if (department === 'classic') return [...common, new THREE.Vector3(8,2.3,-19), new THREE.Vector3(17,2.25,-21), new THREE.Vector3(23,2.15,-23), new THREE.Vector3(25,1.9,-26)];
+  if (department === 'modern') return [...common, new THREE.Vector3(-8,2.3,-24), new THREE.Vector3(-17,2.25,-24.5), new THREE.Vector3(-23,2.15,-24.5), new THREE.Vector3(-25,1.9,-25)];
+  if (department === 'classic') return [...common, new THREE.Vector3(8,2.3,-24), new THREE.Vector3(17,2.25,-24.5), new THREE.Vector3(23,2.15,-24.5), new THREE.Vector3(25,1.9,-25)];
   return [...common, new THREE.Vector3(0,2.3,-22), new THREE.Vector3(0,2.5,-27), new THREE.Vector3(0,2.7,-31), new THREE.Vector3(0,2.8,-34)];
 }
 
@@ -36,8 +41,8 @@ function targetPoints(department: Department | null) {
     new THREE.Vector3(0, 3.8, -20),
     new THREE.Vector3(0, 3.2, -31),
   ];
-  if (department === 'modern') return [...common, new THREE.Vector3(-14,2.5,-24), new THREE.Vector3(-22,2.1,-25), new THREE.Vector3(-25,1.7,-27), new THREE.Vector3(-25,1.3,-30)];
-  if (department === 'classic') return [...common, new THREE.Vector3(14,2.5,-24), new THREE.Vector3(22,2.1,-25), new THREE.Vector3(25,1.7,-27), new THREE.Vector3(25,1.3,-30)];
+  if (department === 'modern') return [...common, new THREE.Vector3(-14,2.5,-24.5), new THREE.Vector3(-22,2.1,-24.5), new THREE.Vector3(-25,1.7,-29), new THREE.Vector3(-25,1.3,-35)];
+  if (department === 'classic') return [...common, new THREE.Vector3(14,2.5,-24.5), new THREE.Vector3(22,2.1,-24.5), new THREE.Vector3(25,1.7,-29), new THREE.Vector3(25,1.3,-35)];
   return [...common, new THREE.Vector3(0,3.2,-33), new THREE.Vector3(0,3.4,-36), new THREE.Vector3(0,3.5,-38), new THREE.Vector3(0,3.5,-39)];
 }
 
@@ -86,8 +91,17 @@ function SceneDirector({ department }: { department: Department | null }) {
   return <>
     {(mask & EXTERIOR) !== 0 && <Suspense fallback={null}><CinematicExterior /><BrandFacadeSign /></Suspense>}
     {(mask & LOBBY) !== 0 && <Suspense fallback={null}><CinematicLobby /></Suspense>}
-    {(mask & MODERN) !== 0 && <Suspense fallback={null}><group position={[-25,0,-20]}><ModernLiving /></group></Suspense>}
-    {(mask & CLASSIC) !== 0 && <Suspense fallback={null}><group position={[25,0,-20]}><NeoClassicLiving /></group></Suspense>}
+    {(mask & MODERN) !== 0 && <Suspense fallback={null}>
+      <group position={[-25,0,-30]}><ModernLiving /></group>
+      <group position={[-25,0,-55]}><ModernDining /></group>
+      <group position={[-25,0,-80]}><ModernBedroom /></group>
+      <group position={[-25,0,-105]}><KidsRoom /></group>
+    </Suspense>}
+    {(mask & CLASSIC) !== 0 && <Suspense fallback={null}>
+      <group position={[25,0,-30]}><NeoClassicLiving /></group>
+      <group position={[25,0,-55]}><NeoClassicDining /></group>
+      <group position={[25,0,-80]}><NeoClassicBedroom /></group>
+    </Suspense>}
   </>;
 }
 

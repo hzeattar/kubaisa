@@ -16,41 +16,35 @@ const configureTextureSet = (textures: TextureSet, repeatX: number, repeatY: num
   });
 };
 
-function usePbrTextureSet(paths: TexturePaths, repeatX: number, repeatY: number) {
-  const textures = useTexture(paths) as TextureSet;
+function usePbrTextureSet(paths: Partial<TexturePaths>, repeatX: number, repeatY: number) {
+  const textures = useTexture(paths as Record<string, string>) as TextureSet;
   useEffect(() => configureTextureSet(textures, repeatX, repeatY), [textures, repeatX, repeatY]);
   return textures;
 }
 
-const marblePaths: TexturePaths = {
+const marblePaths: Omit<TexturePaths, 'roughnessMap'> = {
   map: '/textures/marble/Marble012_1K-JPG_Color.jpg',
   normalMap: '/textures/marble/Marble012_1K-JPG_NormalGL.jpg',
-  roughnessMap: '/textures/marble/Marble012_1K-JPG_Roughness.jpg',
 };
-const plasterPaths: TexturePaths = {
+const plasterPaths: Omit<TexturePaths, 'roughnessMap'> = {
   map: '/textures/plaster/Plaster001_1K-JPG_Color.jpg',
   normalMap: '/textures/plaster/Plaster001_1K-JPG_NormalGL.jpg',
-  roughnessMap: '/textures/plaster/Plaster001_1K-JPG_Roughness.jpg',
 };
-const woodPaths: TexturePaths = {
+const woodPaths: Omit<TexturePaths, 'roughnessMap'> = {
   map: '/textures/wood/Wood062_1K-JPG_Color.jpg',
   normalMap: '/textures/wood/Wood062_1K-JPG_NormalGL.jpg',
-  roughnessMap: '/textures/wood/Wood062_1K-JPG_Roughness.jpg',
 };
-const metalPaths: TexturePaths = {
+const metalPaths: Omit<TexturePaths, 'roughnessMap'> = {
   map: '/textures/metal/Metal034_1K-JPG_Color.jpg',
   normalMap: '/textures/metal/Metal034_1K-JPG_NormalGL.jpg',
-  roughnessMap: '/textures/metal/Metal034_1K-JPG_Roughness.jpg',
 };
-const modernFabricPaths: TexturePaths = {
+const modernFabricPaths: Omit<TexturePaths, 'roughnessMap'> = {
   map: '/textures/fabric_modern/Fabric030_1K-JPG_Color.jpg',
   normalMap: '/textures/fabric_modern/Fabric030_1K-JPG_NormalGL.jpg',
-  roughnessMap: '/textures/fabric_modern/Fabric030_1K-JPG_Roughness.jpg',
 };
-const classicFabricPaths: TexturePaths = {
+const classicFabricPaths: Omit<TexturePaths, 'roughnessMap'> = {
   map: '/textures/fabric_classic/Fabric042_1K-JPG_Color.jpg',
   normalMap: '/textures/fabric_classic/Fabric042_1K-JPG_NormalGL.jpg',
-  roughnessMap: '/textures/fabric_classic/Fabric042_1K-JPG_Roughness.jpg',
 };
 
 export const useMarbleTexture = () => usePbrTextureSet(marblePaths, 4, 4);

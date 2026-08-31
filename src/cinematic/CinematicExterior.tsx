@@ -77,7 +77,7 @@ export const CinematicExterior: React.FC = () => {
 
   return (
     <group>
-      <Environment files="/hdri/sunset.hdr" background blur={0.12} />
+      <Environment preset="sunset" background blur={0.12} />
 
       <mesh position={[0, -0.08, -4]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[130, 95]} />
@@ -113,11 +113,11 @@ export const CinematicExterior: React.FC = () => {
         <group position={[0, 0, 2.55]}>
           <mesh position={[-2.12, 3.1, 0.32]} castShadow receiveShadow>
             <boxGeometry args={[4.1, 5.8, 0.1]} />
-            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transmission={0.08} transparent opacity={0.68} />
+            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transparent opacity={0.68} />
           </mesh>
           <mesh position={[2.12, 3.1, 0.32]} castShadow receiveShadow>
             <boxGeometry args={[4.1, 5.8, 0.1]} />
-            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transmission={0.08} transparent opacity={0.68} />
+            <meshPhysicalMaterial color="#18252d" roughness={0.08} metalness={0.18} transparent opacity={0.68} />
           </mesh>
           <mesh position={[0, 6.85, -0.02]} castShadow receiveShadow>
             <boxGeometry args={[12.8, 0.7, 1.55]} />
@@ -155,7 +155,7 @@ export const CinematicExterior: React.FC = () => {
         </mesh>
         <mesh position={[0, 0.29, 0]}>
           <cylinderGeometry args={[5.45, 5.45, 0.12, 64]} />
-          <meshPhysicalMaterial color="#23323b" roughness={0.08} metalness={0.18} transmission={0.15} transparent opacity={0.82} />
+          <meshPhysicalMaterial color="#23323b" roughness={0.08} metalness={0.18} transparent opacity={0.82} />
         </mesh>
         <mesh position={[0, 0.52, 0]} castShadow>
           <cylinderGeometry args={[0.82, 1.12, 0.6, 40]} />
