@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CinematicCanvas } from './CinematicCanvas';
 import { cinematicScroll } from './scrollState';
 
+const CINEMATIC_SCROLL_END = 0.78;
+
 const getIsMobile = () => {
   if (typeof window === 'undefined') return false;
   return window.matchMedia('(max-width: 800px)').matches;
@@ -35,7 +37,8 @@ export function CinematicVisual() {
 
     const tick = () => {
       if (Number.isFinite(video.duration) && video.duration > 0) {
-        const desired = cinematicScroll.progress * Math.max(0, video.duration - 0.04);
+        const normalized = Math.min(1, Math.max(0, cinematicScroll.progress / CINEMATIC_SCROLL_END));
+        const desired = normalized * Math.max(0, video.duration - 0.04);
         const delta = desired - video.currentTime;
 
         if (Math.abs(delta) > 0.6) {
