@@ -1,11 +1,11 @@
 import { Image, RoundedBox } from '@react-three/drei';
-import { useSharedTextures } from '../components/3d/Materials';
+import { useArchitecturalTextures } from '../components/3d/Materials';
 
 const gold = '#c7a45b';
 const stone = '#eee7dc';
 
 function LobbyColumn({ x, z }: { x: number; z: number }) {
-  const { plaster, marble, metal } = useSharedTextures();
+  const { plaster, marble, metal } = useArchitecturalTextures();
   return (
     <group position={[x, 0, z]}>
       <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
@@ -29,7 +29,7 @@ function LobbyColumn({ x, z }: { x: number; z: number }) {
 }
 
 function StairFlight({ side }: { side: -1 | 1 }) {
-  const { marble, metal } = useSharedTextures();
+  const { marble, metal } = useArchitecturalTextures();
   return (
     <group position={[side * 5.3, 0, -27.5]} rotation={[0, side * -0.16, 0]}>
       {Array.from({ length: 16 }, (_, i) => {
@@ -52,7 +52,7 @@ function StairFlight({ side }: { side: -1 | 1 }) {
 }
 
 function Chandelier() {
-  const { metal } = useSharedTextures();
+  const { metal } = useArchitecturalTextures();
   return (
     <group position={[0, 7.65, -19.5]}>
       <mesh castShadow>
@@ -78,7 +78,7 @@ function Chandelier() {
 }
 
 function HeroConsole() {
-  const { marble, wood, metal } = useSharedTextures();
+  const { marble, wood, metal } = useArchitecturalTextures();
   return (
     <group position={[0, 0, -18.5]}>
       <RoundedBox args={[6.4, 1.3, 1.2]} radius={0.28} smoothness={5} position={[0, 0.78, 0]} castShadow receiveShadow>
@@ -96,7 +96,7 @@ function HeroConsole() {
 }
 
 export function CinematicLobby() {
-  const { marble, plaster, wood, metal } = useSharedTextures();
+  const { marble, plaster, wood, metal } = useArchitecturalTextures();
 
   return (
     <group>
