@@ -1,12 +1,12 @@
 import { Suspense, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Lobby } from '../scenes/lobby/Lobby';
 import { ModernLiving } from '../scenes/living/modern/ModernLiving';
 import { NeoClassicLiving } from '../scenes/living/neoclassic/NeoClassicLiving';
 import { cinematicScroll } from './scrollState';
 import { BrandFacadeSign } from './BrandFacadeSign';
 import { CinematicExterior } from './CinematicExterior';
+import { CinematicLobby } from './CinematicLobby';
 import { CinematicStaticFallback } from './CinematicVisualBoundary';
 
 const CAMERA_POINTS = [
@@ -14,11 +14,11 @@ const CAMERA_POINTS = [
   new THREE.Vector3(0, 4.8, 18),
   new THREE.Vector3(0, 3.2, 8),
   new THREE.Vector3(0, 2.2, -8),
-  new THREE.Vector3(0, 2.1, -18),
-  new THREE.Vector3(-19, 2.2, -19),
+  new THREE.Vector3(0, 2.15, -18),
+  new THREE.Vector3(-19, 2.25, -19),
   new THREE.Vector3(-25, 2.1, -24),
-  new THREE.Vector3(0, 2.4, -24),
-  new THREE.Vector3(20, 2.2, -20),
+  new THREE.Vector3(0, 2.6, -24),
+  new THREE.Vector3(20, 2.25, -20),
   new THREE.Vector3(25, 2.1, -25),
 ] as const;
 
@@ -26,11 +26,11 @@ const TARGET_POINTS = [
   new THREE.Vector3(0, 8, -12),
   new THREE.Vector3(0, 7, -13),
   new THREE.Vector3(0, 4.5, -14),
-  new THREE.Vector3(0, 3.5, -20),
-  new THREE.Vector3(0, 2.5, -28),
+  new THREE.Vector3(0, 3.8, -20),
+  new THREE.Vector3(0, 3.2, -31),
   new THREE.Vector3(-24, 2, -25),
   new THREE.Vector3(-25, 1.4, -28),
-  new THREE.Vector3(0, 2, -28),
+  new THREE.Vector3(0, 3.2, -31),
   new THREE.Vector3(24, 2, -25),
   new THREE.Vector3(25, 1.4, -28),
 ] as const;
@@ -44,10 +44,6 @@ const CLASSIC = 8;
 function getSceneMask(progress: number) {
   let mask = 0;
 
-  // The old implementation rendered every room at the same time. That meant
-  // the lobby entrance wall could sit in front of the exterior hero shot and
-  // distant rooms could leak into unrelated camera angles. These windows keep
-  // only the current act and a small transition overlap mounted.
   if (progress < 0.4) mask |= EXTERIOR;
   if ((progress >= 0.34 && progress < 0.58) || (progress >= 0.72 && progress < 0.88)) mask |= LOBBY;
   if (progress >= 0.5 && progress < 0.76) mask |= MODERN;
@@ -110,7 +106,7 @@ function SceneDirector() {
 
       {(mask & LOBBY) !== 0 && (
         <Suspense fallback={null}>
-          <Lobby />
+          <CinematicLobby />
         </Suspense>
       )}
 
@@ -133,12 +129,13 @@ function CinematicWorld() {
   return (
     <>
       <color attach="background" args={['#07101b']} />
+      <fog attach="fog" args={['#07101b', 48, 120]} />
       <CinematicCamera />
-      <ambientLight intensity={0.2} color="#ffe8cb" />
-      <hemisphereLight args={['#fff0d8', '#17110c', 0.46]} />
+      <ambientLight intensity={0.18} color="#ffe8cb" />
+      <hemisphereLight args={['#fff0d8', '#17110c', 0.42]} />
       <directionalLight
         position={[22, 28, 28]}
-        intensity={1.25}
+        intensity={1.2}
         color="#ffe3b0"
         castShadow
         shadow-bias={-0.0004}
