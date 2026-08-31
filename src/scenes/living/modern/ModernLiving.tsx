@@ -113,8 +113,9 @@ function ShowroomWindow({ x, textures }: { x: number; textures: ModernTextures }
 }
 
 function RoomShell({ textures }: { textures: ModernTextures }) {
-  const { wood, plaster, marble, metal } = textures;
+  const { wood, plaster, metal } = textures;
   const ceilingRibs = [-7.5, -2.5, 2.5, 7.5];
+  const panelCenters = [-8.25, 0, 8.25];
 
   return (
     <group>
@@ -147,11 +148,11 @@ function RoomShell({ textures }: { textures: ModernTextures }) {
       <ShowroomWindow x={-5.0} textures={textures} />
       <ShowroomWindow x={5.0} textures={textures} />
 
-      {/* Shallow wall panelling gives scale and depth without ornamental clutter. */}
-      <Instances limit={6} castShadow>
-        <boxGeometry args={[2.6, 3.8, 0.07]} />
+      {/* Panels live only in the solid wall zones so they never cover the glazing. */}
+      <Instances limit={panelCenters.length} castShadow>
+        <boxGeometry args={[1.3, 3.8, 0.07]} />
         <meshStandardMaterial {...plaster} color="#eee9e2" roughness={0.72} />
-        {[-6.0, -3.0, 0, 3.0, 6.0].map((x) => (
+        {panelCenters.map((x) => (
           <Instance key={x} position={[x, 3.0, -13.1]} />
         ))}
       </Instances>
@@ -171,7 +172,6 @@ function RoomShell({ textures }: { textures: ModernTextures }) {
         ))}
       </Instances>
 
-      {/* Thin champagne datum line used as a brand accent, not a gold wall treatment. */}
       <mesh position={[0, 1.18, -13.1]} castShadow>
         <boxGeometry args={[17.5, 0.055, 0.06]} />
         <meshStandardMaterial {...metal} color={CHAMPAGNE} metalness={0.82} roughness={0.38} />
