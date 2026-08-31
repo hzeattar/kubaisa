@@ -1,14 +1,16 @@
 /**
- * Qubaisa Virtual Palace — cinematic scroll experience
+ * Qubaisa Virtual Palace — hybrid cinematic + interactive showroom.
  *
- * The primary interaction is native vertical scrolling. The persistent cinematic
- * visual is directed by scroll progress; visitors never need game controls,
- * a joystick, or pointer-lock to understand the brand story.
+ * Scroll introduces the palace and carries the visitor through the arrival.
+ * Once inside, the visitor chooses a department and enters an interactive
+ * furniture room with guided viewpoints, free look and product price hotspots.
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CinematicVisual } from './cinematic/CinematicVisual';
 import { cinematicScroll } from './cinematic/scrollState';
+import { InteractiveRoomExperience, type InteractiveRoom } from './interactive/InteractiveRoomExperience';
+import './interactive/interactive.css';
 import { useAppStore } from './stores/useAppStore';
 
 type Language = 'ar' | 'en';
@@ -23,6 +25,9 @@ const COPY: Record<Language, {
   navCollections: string;
   navContact: string;
   scroll: string;
+  chooseDepartment: string;
+  chooseDepartmentBody: string;
+  enter: string;
   hero: ChapterCopy;
   entrance: ChapterCopy;
   modern: ChapterCopy;
@@ -40,83 +45,89 @@ const COPY: Record<Language, {
   facebook: string;
 }> = {
   ar: {
-    navCollections: 'المجموعات',
+    navCollections: 'الأقسام',
     navContact: 'تواصل معنا',
-    scroll: 'مرّر لاكتشاف قبيصة',
+    scroll: 'مرّر للدخول إلى قصر قبيصة',
+    chooseDepartment: 'اختر جناحك',
+    chooseDepartmentBody: 'من بهو القصر يمكنك الدخول مباشرة إلى الجناح الذي تريد استكشافه.',
+    enter: 'دخول الجناح',
     hero: {
       eyebrow: 'QUBAISA FURNITURE',
-      title: 'قبيصة — الأثاث كما يجب أن يُرى',
-      body: 'تجربة بصرية هادئة تأخذك من واجهة قبيصة إلى تفاصيل المودرن والنيو كلاسيك بدون أي تحكم معقد.',
+      title: 'قبيصة — الأثاث كما يجب أن يُعاش',
+      body: 'ابدأ من واجهة القصر، ادخل إلى البهو، ثم اختر القسم وتجول داخل الغرفة نفسها وشاهد القطع وأسعارها.',
     },
     entrance: {
       eyebrow: 'قصر قبيصة الافتراضي',
-      title: 'ادخل إلى عالم صُمم حول الأثاث',
-      body: 'المشهد يتحرك مع التمرير بينما تظل أنت متحكمًا بالإيقاع. لا مشي افتراضي، لا أزرار ألعاب، فقط رحلة مصممة بعناية.',
+      title: 'أنت الآن داخل البهو',
+      body: 'اختر الجناح الذي تريد زيارته. داخل كل غرفة يمكنك النظر حولك والانتقال بين نقاط التجول والضغط على القطع لمعرفة السعر والتفاصيل.',
     },
     modern: {
       eyebrow: 'MODERN COLLECTION',
-      title: 'مودرن ناعم، منحنيات مريحة، حضور هادئ',
-      body: 'مساحات معيشة معاصرة تركز على الراحة، النسب، الخامات الدافئة والتكوينات الواسعة.',
+      title: 'المعيشة المودرن',
+      body: 'ادخل الجناح المودرن واستكشف تكوينات المعيشة والكنب والكراسي والطاولات من داخل الغرفة.',
     },
     classic: {
       eyebrow: 'NEO-CLASSICAL COLLECTION',
-      title: 'تفاصيل كلاسيكية بروح أكثر هدوءًا',
-      body: 'حفر، خامات فاتحة، لمسات شامبين وتكوينات صالونات فاخرة بدون مبالغة بصرية.',
+      title: 'الصالونات والنيو كلاسيك',
+      body: 'تجول بين التكوينات الكلاسيكية الهادئة وتفاصيل الخشب والمعدن والرخام والقماش.',
     },
     craft: {
       eyebrow: 'CRAFT & MATERIAL',
-      title: 'القيمة تظهر في التفاصيل',
-      body: 'القماش، الخشب، الرخام والمعدن هي ما يجب أن تقوده اللقطات القريبة؛ المنتج أولًا والمؤثرات ثانيًا.',
+      title: 'التفاصيل جزء من التجربة',
+      body: 'كل قطعة قابلة للربط ببياناتها وسعرها الحقيقي وصورها وخاماتها فور توفر بيانات قبيصة الموثقة.',
     },
-    collectionsTitle: 'اكتشف المجموعات',
-    collectionsBody: 'بعد الرحلة السينمائية يعود الموقع إلى واجهة واضحة وسريعة للوصول إلى أقسام الأثاث والتواصل.',
+    collectionsTitle: 'اختر القسم',
+    collectionsBody: 'يمكنك الدخول للأقسام المتاحة الآن، وسيتم إضافة السفرة وغرف النوم وباقي أدوار القصر بنفس نظام التجول التفاعلي.',
     modernCard: 'المعيشة المودرن',
     classicCard: 'الصالونات والنيو كلاسيك',
     diningCard: 'السفرة',
     bedroomCard: 'غرف النوم',
     comingSoon: 'قريبًا',
     contactTitle: 'هل تريد معرفة المزيد؟',
-    contactBody: 'هذه النسخة تبني الأساس البصري والتقني. بيانات التواصل والمنتجات النهائية تُربط فقط من مصادر قبيصة الموثقة.',
+    contactBody: 'الأسعار النهائية وبيانات المنتجات يتم عرضها فقط عندما تكون موثقة من قبيصة. النماذج الحالية الاسترشادية لا تحصل على أسعار مخترعة.',
     facebook: 'صفحة قبيصة على فيسبوك',
   },
   en: {
-    navCollections: 'Collections',
+    navCollections: 'Departments',
     navContact: 'Contact',
-    scroll: 'Scroll to discover Qubaisa',
+    scroll: 'Scroll to enter Qubaisa Palace',
+    chooseDepartment: 'Choose your wing',
+    chooseDepartmentBody: 'From the palace lobby, enter the department you want to explore.',
+    enter: 'Enter wing',
     hero: {
       eyebrow: 'QUBAISA FURNITURE',
-      title: 'Furniture, presented as an experience',
-      body: 'A calm visual journey from the Qubaisa facade into modern and neo-classical collections — without game-like controls.',
+      title: 'Furniture designed to be experienced',
+      body: 'Arrive at the palace, enter the lobby, choose a department, then explore the room itself and discover product prices and details.',
     },
     entrance: {
       eyebrow: 'QUBAISA VIRTUAL PALACE',
-      title: 'Enter a world built around furniture',
-      body: 'The scene moves with your scroll while you control the pace. No virtual walking, no gaming HUD — only directed visual storytelling.',
+      title: 'You are now inside the lobby',
+      body: 'Choose a wing. Inside every room you can look around, move between curated viewpoints and select furniture to view pricing and details.',
     },
     modern: {
       eyebrow: 'MODERN COLLECTION',
-      title: 'Soft geometry, generous comfort, quiet presence',
-      body: 'Contemporary living compositions focused on comfort, proportion, warm materials and spacious layouts.',
+      title: 'Modern Living',
+      body: 'Enter the modern wing and explore sofas, lounge chairs and tables from inside the furnished room.',
     },
     classic: {
       eyebrow: 'NEO-CLASSICAL COLLECTION',
-      title: 'Classical detail with a calmer expression',
-      body: 'Carving, pale upholstery, champagne accents and luxurious salon compositions without visual excess.',
+      title: 'Neo-Classical & Salons',
+      body: 'Explore calm classical compositions and details in wood, metal, marble and upholstery.',
     },
     craft: {
       eyebrow: 'CRAFT & MATERIAL',
-      title: 'Value lives in the details',
-      body: 'Fabric, wood, marble and metal should lead the close-up moments. Product first; effects second.',
+      title: 'Detail is part of the experience',
+      body: 'Every piece can be connected to verified pricing, photography, materials and product data as soon as Qubaisa approves the information.',
     },
-    collectionsTitle: 'Explore the collections',
-    collectionsBody: 'After the cinematic journey the experience resolves into a clear, fast path to furniture categories and contact.',
+    collectionsTitle: 'Choose a department',
+    collectionsBody: 'Enter the available wings now. Dining, bedrooms and the remaining palace floors will use the same interactive room system as they are completed.',
     modernCard: 'Modern Living',
     classicCard: 'Neo-Classical & Salons',
     diningCard: 'Dining',
     bedroomCard: 'Bedrooms',
     comingSoon: 'Coming soon',
     contactTitle: 'Want to know more?',
-    contactBody: 'This build establishes the visual and technical foundation. Final contact and product data should only come from verified Qubaisa sources.',
+    contactBody: 'Final pricing and product data are shown only when verified by Qubaisa. Current proxy displays never receive invented commercial prices.',
     facebook: 'Qubaisa on Facebook',
   },
 };
@@ -124,6 +135,7 @@ const COPY: Record<Language, {
 export default function App() {
   const language = useAppStore((state) => state.language) as Language;
   const setLanguage = useAppStore((state) => state.setLanguage);
+  const [activeRoom, setActiveRoom] = useState<InteractiveRoom | null>(null);
   const copy = COPY[language];
 
   useEffect(() => {
@@ -157,11 +169,13 @@ export default function App() {
   }, []);
 
   const collectionCards = useMemo(() => [
-    { title: copy.modernCard, status: '01', enabled: true },
-    { title: copy.classicCard, status: '02', enabled: true },
-    { title: copy.diningCard, status: copy.comingSoon, enabled: false },
-    { title: copy.bedroomCard, status: copy.comingSoon, enabled: false },
+    { title: copy.modernCard, status: '01', enabled: true, room: 'modern' as InteractiveRoom },
+    { title: copy.classicCard, status: '02', enabled: true, room: 'classic' as InteractiveRoom },
+    { title: copy.diningCard, status: copy.comingSoon, enabled: false, room: null },
+    { title: copy.bedroomCard, status: copy.comingSoon, enabled: false, room: null },
   ], [copy]);
+
+  const enterRoom = (room: InteractiveRoom) => setActiveRoom(room);
 
   return (
     <main className="cinematic-site">
@@ -190,20 +204,29 @@ export default function App() {
         <div className="cinematic-grain" />
       </div>
 
-      <div className="scroll-progress" aria-hidden="true">
-        <span />
-      </div>
+      <div className="scroll-progress" aria-hidden="true"><span /></div>
 
       <section id="top" className="story-chapter story-hero" data-chapter="hero">
         <Chapter copy={copy.hero} align={language === 'ar' ? 'right' : 'left'} hero />
-        <div className="scroll-cue">
-          <span>{copy.scroll}</span>
-          <i />
-        </div>
+        <div className="scroll-cue"><span>{copy.scroll}</span><i /></div>
       </section>
 
       <section className="story-chapter" data-chapter="entrance">
-        <Chapter copy={copy.entrance} align={language === 'ar' ? 'right' : 'left'} />
+        <div className="chapter-copy chapter-copy--right">
+          <span className="chapter-eyebrow">{copy.entrance.eyebrow}</span>
+          <h1>{copy.entrance.title}</h1>
+          <p>{copy.entrance.body}</p>
+          <div className="palace-directory" aria-label={copy.chooseDepartment}>
+            <button type="button" onClick={() => enterRoom('modern')}>
+              <span>01 · MODERN LIVING</span>
+              <strong>{copy.modernCard}</strong>
+            </button>
+            <button type="button" onClick={() => enterRoom('classic')}>
+              <span>02 · NEO-CLASSICAL</span>
+              <strong>{copy.classicCard}</strong>
+            </button>
+          </div>
+        </div>
       </section>
 
       <section className="story-chapter chapter-offset" data-chapter="modern">
@@ -220,13 +243,24 @@ export default function App() {
 
       <section id="collections" className="editorial-section collections-section">
         <div className="editorial-heading">
-          <span>QUBAISA COLLECTIONS</span>
+          <span>QUBAISA DEPARTMENTS</span>
           <h2>{copy.collectionsTitle}</h2>
           <p>{copy.collectionsBody}</p>
         </div>
         <div className="collection-grid">
-          {collectionCards.map((card) => (
-            <article key={card.title} className={`collection-card ${card.enabled ? '' : 'is-disabled'}`}>
+          {collectionCards.map((card) => card.enabled && card.room ? (
+            <button
+              type="button"
+              key={card.title}
+              className="collection-card is-interactive"
+              onClick={() => enterRoom(card.room!)}
+            >
+              <div className="collection-card__index">{card.status}</div>
+              <h3>{card.title}</h3>
+              <div className="collection-card__line" />
+            </button>
+          ) : (
+            <article key={card.title} className="collection-card is-disabled">
               <div className="collection-card__index">{card.status}</div>
               <h3>{card.title}</h3>
               <div className="collection-card__line" />
@@ -250,6 +284,10 @@ export default function App() {
           </a>
         </div>
       </footer>
+
+      {activeRoom && (
+        <InteractiveRoomExperience room={activeRoom} language={language} onClose={() => setActiveRoom(null)} />
+      )}
     </main>
   );
 }
