@@ -1,13 +1,13 @@
 /**
  * Qubaisa Virtual Palace — cinematic scroll experience
  *
- * The primary interaction is native vertical scrolling. The persistent 3D scene is
- * directed by scroll progress; visitors never need game controls, a joystick, or
- * pointer-lock to understand the brand story.
+ * The primary interaction is native vertical scrolling. The persistent cinematic
+ * visual is directed by scroll progress; visitors never need game controls,
+ * a joystick, or pointer-lock to understand the brand story.
  */
 
 import { useEffect, useMemo } from 'react';
-import { CinematicCanvas } from './cinematic/CinematicCanvas';
+import { CinematicVisual } from './cinematic/CinematicVisual';
 import { cinematicScroll } from './cinematic/scrollState';
 import { useAppStore } from './stores/useAppStore';
 
@@ -121,8 +121,6 @@ const COPY: Record<Language, {
   },
 };
 
-const chapters = ['hero', 'entrance', 'modern', 'classic', 'craft'] as const;
-
 export default function App() {
   const language = useAppStore((state) => state.language) as Language;
   const setLanguage = useAppStore((state) => state.setLanguage);
@@ -186,7 +184,7 @@ export default function App() {
       </header>
 
       <div className="cinematic-visual" aria-hidden="true">
-        <CinematicCanvas />
+        <CinematicVisual />
         <div className="cinematic-grade" />
         <div className="cinematic-vignette" />
         <div className="cinematic-grain" />
