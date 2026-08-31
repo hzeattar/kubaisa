@@ -1,12 +1,16 @@
 import React from 'react';
 import { RoundedBox } from '@react-three/drei';
 import { Window } from '../../../components/3d/Architectural';
-import { useSharedTextures } from '../../../components/3d/Materials';
+import {
+  useModernFabricTexture,
+  useModernRoomTextures,
+  useWoodTexture,
+} from '../../../components/3d/Materials';
 
 type SeatModuleProps = { position: [number, number, number]; rotationY?: number; width?: number; armLeft?: boolean; armRight?: boolean };
 
 const SeatModule: React.FC<SeatModuleProps> = ({ position, rotationY = 0, width = 1.75, armLeft = false, armRight = false }) => {
-  const { fabricModern } = useSharedTextures();
+  const fabricModern = useModernFabricTexture();
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <RoundedBox args={[width, 0.42, 1.45]} radius={0.18} smoothness={4} position={[0, 0.48, 0]} castShadow receiveShadow><meshStandardMaterial {...fabricModern} color="#e7dfd2" roughness={0.84} /></RoundedBox>
@@ -18,7 +22,8 @@ const SeatModule: React.FC<SeatModuleProps> = ({ position, rotationY = 0, width 
 };
 
 const LoungeChair: React.FC<{ position: [number, number, number]; rotationY: number }> = ({ position, rotationY }) => {
-  const { fabricModern, wood } = useSharedTextures();
+  const fabricModern = useModernFabricTexture();
+  const wood = useWoodTexture();
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
       <RoundedBox args={[1.55, 0.46, 1.55]} radius={0.22} smoothness={4} position={[0, 0.5, 0]} castShadow receiveShadow><meshStandardMaterial {...fabricModern} color="#d9cfc1" roughness={0.84} /></RoundedBox>
@@ -29,7 +34,7 @@ const LoungeChair: React.FC<{ position: [number, number, number]; rotationY: num
 };
 
 export const ModernLiving: React.FC = () => {
-  const { wood, plaster, marble, metal, fabricModern } = useSharedTextures();
+  const { wood, plaster, marble, metal, fabricModern } = useModernRoomTextures();
   return (
     <group>
       <rectAreaLight position={[0, 5.8, 1]} rotation={[-Math.PI / 2, 0, 0]} width={8} height={6} intensity={4.2} color="#ffe7c7" />
