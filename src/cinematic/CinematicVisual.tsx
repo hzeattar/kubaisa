@@ -3,14 +3,16 @@ import { CinematicCanvas } from './CinematicCanvas';
 import { cinematicScroll } from './scrollState';
 import { CinematicStaticFallback, CinematicVisualBoundary } from './CinematicVisualBoundary';
 
-const CINEMATIC_SCROLL_END = 0.78;
+const CINEMATIC_SCROLL_END = 0.9;
+
+type Department = 'modern' | 'classic';
 
 const getIsMobile = () => {
   if (typeof window === 'undefined') return false;
   return window.matchMedia('(max-width: 800px)').matches;
 };
 
-export function CinematicVisual() {
+export function CinematicVisual({ department }: { department: Department | null }) {
   const [isMobile, setIsMobile] = useState(getIsMobile);
   const [videoFailed, setVideoFailed] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -22,7 +24,10 @@ export function CinematicVisual() {
     return isMobile ? (mobile || desktop) : desktop;
   }, [isMobile]);
 
-  const source = videoFailed ? undefined : configuredSource;
+  // The generic film can cover the palace arrival. Once the visitor chooses a
+  // wing we need a branch-aware visual, so the live R3F journey takes over until
+  // dedicated Modern/Classical films are authored later.
+  const source = department || videoFailed ? undefined : configuredSource;
   const poster = import.meta.env.VITE_CINEMATIC_POSTER;
 
   useEffect(() => {
@@ -48,11 +53,8 @@ export function CinematicVisual() {
         const desired = normalized * Math.max(0, video.duration - 0.04);
         const delta = desired - video.currentTime;
 
-        if (Math.abs(delta) > 0.6) {
-          video.currentTime = desired;
-        } else if (Math.abs(delta) > 0.025) {
-          video.currentTime += delta * 0.22;
-        }
+        if (Math.abs(delta) > 0.6) video.currentTime = desired;
+        else if (Math.abs(delta) > 0.025) video.currentTime += delta * 0.22;
       }
 
       rafRef.current = window.requestAnimationFrame(tick);
@@ -68,7 +70,7 @@ export function CinematicVisual() {
   if (!source) {
     return (
       <CinematicVisualBoundary>
-        <CinematicCanvas />
+        <CinematicCanvas department={department} />
       </CinematicVisualBoundary>
     );
   }
