@@ -100,23 +100,16 @@ export function CinematicLobby() {
 
   return (
     <group>
-      {/* Open-front grand hall: the camera can enter without crossing hidden geometry. */}
       <mesh position={[0, -0.08, -19.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[31, 43]} />
         <meshStandardMaterial {...marble} color="#d8d0c5" roughness={0.3} />
       </mesh>
 
-      {/* Inlaid arrival runner creates depth and keeps the eye on the central axis. */}
       <mesh position={[0, -0.015, -16.2]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[7.2, 31]} />
         <meshStandardMaterial {...wood} color="#2d261f" roughness={0.52} />
       </mesh>
-      <mesh position={[0, 0.005, -16.2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.01, 0.16, 4]} />
-        <meshStandardMaterial {...metal} color={gold} metalness={0.85} roughness={0.35} />
-      </mesh>
 
-      {/* Side walls stop short of the camera entry and use framed bays instead of blank slabs. */}
       {[-1, 1].map((side) => (
         <group key={side} position={[side * 14.5, 0, -19.5]}>
           <mesh position={[0, 4.6, 0]} receiveShadow>
@@ -138,7 +131,6 @@ export function CinematicLobby() {
         </group>
       ))}
 
-      {/* Feature wall / elevator portal */}
       <group position={[0, 0, -39.7]}>
         <mesh position={[0, 4.65, 0]} receiveShadow>
           <boxGeometry args={[29.4, 9.3, 0.8]} />
@@ -176,16 +168,12 @@ export function CinematicLobby() {
       <Chandelier />
       <HeroConsole />
 
-      {/* Warm wall washers. */}
       {[-10, -5, 5, 10].map((x) => (
-        <spotLight
+        <pointLight
           key={x}
-          position={[x, 7.8, -10]}
-          target-position={[x, 0, -21]}
-          intensity={34}
-          distance={23}
-          angle={0.38}
-          penumbra={0.8}
+          position={[x, 6.7, -18]}
+          intensity={9}
+          distance={12}
           decay={2}
           color="#ffd8a3"
         />
@@ -193,7 +181,6 @@ export function CinematicLobby() {
 
       <rectAreaLight width={12} height={2.8} intensity={7} color="#ffe0ad" position={[0, 7.2, -34]} rotation={[0, 0, 0]} />
 
-      {/* Ceiling framing rather than a flat low ceiling keeps the lobby double-height. */}
       <mesh position={[0, 9.2, -20]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[30, 40]} />
         <meshStandardMaterial {...plaster} color={stone} roughness={0.78} side={2} />
