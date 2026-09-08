@@ -1,235 +1,80 @@
-import { Image, Instance, Instances, RoundedBox } from '@react-three/drei';
-import { useArchitecturalTextures } from '../components/3d/Materials';
-
-const gold = '#c7a45b';
-const stone = '#eee7dc';
-
-function LobbyColumn({ x, z }: { x: number; z: number }) {
-  const { plaster, marble, metal } = useArchitecturalTextures();
-
-  return (
-    <group position={[x, 0, z]}>
-      <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.72, 0.84, 0.44, 24]} />
-        <meshPhysicalMaterial {...marble} color="#d8cfc1" roughness={0.36} clearcoat={0.05} />
-      </mesh>
-      <mesh position={[0, 4.2, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.46, 0.54, 7.95, 28]} />
-        <meshStandardMaterial {...plaster} color="#f2ece2" roughness={0.68} />
-      </mesh>
-      <mesh position={[0, 8.28, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.78, 0.55, 0.52, 24]} />
-        <meshStandardMaterial {...plaster} color="#e8dfd2" roughness={0.64} />
-      </mesh>
-      <mesh position={[0, 8.54, 0]} castShadow>
-        <cylinderGeometry args={[0.9, 0.9, 0.12, 24]} />
-        <meshStandardMaterial {...metal} color={gold} roughness={0.36} metalness={0.88} />
-      </mesh>
-    </group>
-  );
-}
-
-function StairFlight({ side }: { side: -1 | 1 }) {
-  const { marble, metal } = useArchitecturalTextures();
-
-  return (
-    <group position={[side * 5.3, 0, -27.5]} rotation={[0, side * -0.16, 0]}>
-      <Instances limit={16} castShadow receiveShadow>
-        <boxGeometry args={[1, 0.2, 0.74]} />
-        <meshPhysicalMaterial {...marble} color="#e8e0d5" roughness={0.26} clearcoat={0.06} />
-        {Array.from({ length: 16 }, (_, i) => {
-          const y = 0.12 + i * 0.19;
-          const z = i * -0.36;
-          const width = 5.2 - i * 0.05;
-          return <Instance key={i} position={[0, y, z]} scale={[width, 1, 1]} />;
-        })}
-      </Instances>
-      <mesh position={[side * -2.45, 2.0, -2.8]} rotation={[Math.PI / 2.66, 0, 0]} castShadow>
-        <cylinderGeometry args={[0.055, 0.055, 6.9, 14]} />
-        <meshStandardMaterial {...metal} color={gold} metalness={0.9} roughness={0.32} />
-      </mesh>
-    </group>
-  );
-}
-
-function Chandelier() {
-  const { metal } = useArchitecturalTextures();
-
-  return (
-    <group position={[0, 7.65, -19.5]}>
-      <mesh castShadow>
-        <cylinderGeometry args={[0.035, 0.035, 2.4, 12]} />
-        <meshStandardMaterial {...metal} color="#9d7d42" metalness={0.9} roughness={0.3} />
-      </mesh>
-      {[2.5, 1.75, 1.1].map((radius, index) => (
-        <mesh key={radius} position={[0, -1.0 - index * 0.58, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <torusGeometry args={[radius, 0.075, 16, 72]} />
-          <meshStandardMaterial
-            {...metal}
-            color={index === 0 ? '#d5b66c' : '#c39d52'}
-            metalness={0.92}
-            roughness={0.28}
-            emissive="#8f6727"
-            emissiveIntensity={0.32}
-          />
-        </mesh>
-      ))}
-      <pointLight position={[0, -2.0, 0]} intensity={11} distance={15} decay={2} color="#ffd9a0" />
-    </group>
-  );
-}
-
-function HeroConsole() {
-  const { marble, wood, metal } = useArchitecturalTextures();
-
-  return (
-    <group position={[0, 0, -18.5]}>
-      <RoundedBox args={[6.4, 1.3, 1.2]} radius={0.28} smoothness={5} position={[0, 0.78, 0]} castShadow receiveShadow>
-        <meshStandardMaterial {...wood} color="#30251f" roughness={0.48} />
-      </RoundedBox>
-      <RoundedBox args={[6.7, 0.13, 1.38]} radius={0.18} smoothness={4} position={[0, 1.5, 0]} castShadow receiveShadow>
-        <meshPhysicalMaterial {...marble} color="#f1e9df" roughness={0.18} clearcoat={0.16} clearcoatRoughness={0.28} />
-      </RoundedBox>
-      <mesh position={[0, 0.2, 0.66]} castShadow>
-        <boxGeometry args={[5.4, 0.08, 0.08]} />
-        <meshStandardMaterial {...metal} color={gold} metalness={0.9} roughness={0.32} />
-      </mesh>
-    </group>
-  );
-}
+import { Image, MeshReflectorMaterial, MeshTransmissionMaterial, Float, ContactShadows } from '@react-three/drei';
 
 export function CinematicLobby() {
-  const { marble, plaster, wood, metal } = useArchitecturalTextures();
-
   return (
     <group>
-      <mesh position={[0, -0.08, -19.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[31, 43]} />
-        <meshPhysicalMaterial
-          {...marble}
-          color="#d8d0c5"
-          roughness={0.24}
-          clearcoat={0.13}
-          clearcoatRoughness={0.3}
+      {/* Luxury Mirror Floor */}
+      <mesh position={[0, -0.05, -20]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[50, 60]} />
+        <MeshReflectorMaterial
+          blur={[300, 100]}
+          resolution={1024}
+          mixBlur={1}
+          mixStrength={80}
+          roughness={0.1}
+          depthScale={1.2}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.4}
+          color="#151515"
+          metalness={0.5}
         />
       </mesh>
 
-      <mesh position={[0, -0.015, -16.2]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[7.2, 31]} />
-        <meshStandardMaterial {...wood} color="#2d261f" roughness={0.52} />
-      </mesh>
+      {/* Ground Contact Shadows for grounded realism without heavy shadowmaps */}
+      <ContactShadows position={[0, 0, -20]} scale={50} blur={2} far={10} opacity={0.5} />
 
+      {/* Abstract Glowing Architecture (Glass Panels) */}
       {[-1, 1].map((side) => (
-        <group key={side} position={[side * 14.5, 0, 0]}>
-          <mesh position={[0, 4.6, -8.75]} receiveShadow>
-            <boxGeometry args={[0.65, 9.2, 21.5]} />
-            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
-          </mesh>
-          <mesh position={[0, 4.6, -34.75]} receiveShadow>
-            <boxGeometry args={[0.65, 9.2, 10.5]} />
-            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
-          </mesh>
-          <mesh position={[0, 8.2, -24.5]} receiveShadow>
-            <boxGeometry args={[0.65, 2.0, 10]} />
-            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
-          </mesh>
-          <mesh position={[side * 15, -0.08, -24.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-            <planeGeometry args={[30, 10]} />
-            <meshPhysicalMaterial {...marble} color="#d8d0c5" roughness={0.26} clearcoat={0.1} />
-          </mesh>
-          <mesh position={[side * 15, 9.2, -24.5]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
-            <planeGeometry args={[30, 10]} />
-            <meshStandardMaterial {...plaster} color={stone} roughness={0.78} side={2} />
-          </mesh>
-          <mesh position={[side * 22.5, 4.6, -19.5]} receiveShadow>
-            <boxGeometry args={[15, 9.2, 0.65]} />
-            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
-          </mesh>
-          <mesh position={[side * 17.5, 4.6, -29.5]} receiveShadow>
-            <boxGeometry args={[5, 9.2, 0.65]} />
-            <meshStandardMaterial {...plaster} color="#e9e2d8" roughness={0.68} />
-          </mesh>
-          <group position={[side * 22, 0, -29.5]}>
-            <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
-              <boxGeometry args={[3.2, 7, 0.8]} />
-              <meshStandardMaterial color="#1f1a16" roughness={0.8} />
+        <group key={side} position={[side * 8, 0, 0]}>
+          <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.5}>
+            <mesh position={[0, 4, -15]} rotation={[0, side * 0.1, 0]}>
+              <boxGeometry args={[4, 10, 0.2]} />
+              <MeshTransmissionMaterial 
+                backside
+                samples={4}
+                thickness={2}
+                chromaticAberration={0.05}
+                anisotropy={0.1}
+                distortion={0.1}
+                distortionScale={0.3}
+                temporalDistortion={0.1}
+                color="#e5dfd5"
+              />
             </mesh>
-            <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
-              <boxGeometry args={[3.6, 7.4, 0.2]} />
-              <meshPhysicalMaterial {...marble} color="#e6dfd1" roughness={0.26} clearcoat={0.08} />
+          </Float>
+          
+          <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
+            <mesh position={[side * 4, 3, -25]} rotation={[0, side * -0.2, 0]}>
+              <boxGeometry args={[3, 8, 0.1]} />
+              <MeshTransmissionMaterial 
+                backside
+                samples={4}
+                thickness={1}
+                chromaticAberration={0.02}
+                color="#ffffff"
+              />
             </mesh>
-          </group>
-          <group position={[side * 27, 0, -29.5]}>
-            <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
-              <boxGeometry args={[3.2, 7, 0.8]} />
-              <meshStandardMaterial color="#1f1a16" roughness={0.8} />
-            </mesh>
-            <mesh position={[0, 3.5, 0.4]} castShadow receiveShadow>
-              <boxGeometry args={[3.6, 7.4, 0.2]} />
-              <meshPhysicalMaterial {...marble} color="#e6dfd1" roughness={0.26} clearcoat={0.08} />
-            </mesh>
-          </group>
-          {[-7, -15, -31, -39].map((z) => (
-            <group key={z} position={[side * -0.4, 0, z]}>
-              <mesh position={[0, 3.9, 0]} castShadow receiveShadow>
-                <boxGeometry args={[0.24, 5.9, 5.4]} />
-                <meshStandardMaterial {...plaster} color="#f5efe7" roughness={0.66} />
-              </mesh>
-              <mesh position={[side * -0.15, 3.9, 0]}>
-                <boxGeometry args={[0.12, 4.7, 4.2]} />
-                <meshStandardMaterial color="#18212a" roughness={0.32} metalness={0.2} />
-              </mesh>
-            </group>
-          ))}
+          </Float>
         </group>
       ))}
 
-      <group position={[0, 0, -39.7]}>
-        <mesh position={[0, 4.65, 0]} receiveShadow>
-          <boxGeometry args={[29.4, 9.3, 0.8]} />
-          <meshStandardMaterial {...plaster} color="#111820" roughness={0.72} />
-        </mesh>
-        <mesh position={[0, 4.6, 0.5]} castShadow receiveShadow>
-          <boxGeometry args={[9.6, 8.0, 0.28]} />
-          <meshPhysicalMaterial {...marble} color="#d8ccbc" roughness={0.25} clearcoat={0.1} />
-        </mesh>
-        <mesh position={[0, 2.85, 0.68]} castShadow>
-          <boxGeometry args={[4.25, 5.7, 0.12]} />
-          <meshStandardMaterial {...metal} color="#6e5a3f" metalness={0.88} roughness={0.28} />
-        </mesh>
-        <mesh position={[0, 2.85, 0.76]}>
-          <boxGeometry args={[0.035, 5.65, 0.12]} />
-          <meshStandardMaterial color="#17130f" />
-        </mesh>
-      </group>
+      {/* Grand Central Monolith (Holds Logo) */}
+      <mesh position={[0, 5, -35]}>
+        <boxGeometry args={[12, 10, 1]} />
+        <meshStandardMaterial color="#0a0a0a" roughness={0.2} metalness={0.8} />
+      </mesh>
 
+      {/* Qubaisa Logo Floating in the Dark */}
       <Image
         url="/brand/qubaisa-logo.webp"
-        position={[0, 6.6, -39.15]}
-        scale={[4.6, 1.55]}
+        position={[0, 5, -34.4]}
+        scale={[6, 2]}
         toneMapped={false}
         transparent
       />
 
-      <LobbyColumn x={-8.6} z={-12.5} />
-      <LobbyColumn x={8.6} z={-12.5} />
-      <LobbyColumn x={-8.6} z={-27.2} />
-      <LobbyColumn x={8.6} z={-27.2} />
-
-      <StairFlight side={-1} />
-      <StairFlight side={1} />
-      <Chandelier />
-      <HeroConsole />
-
-      {/* Broad ceiling washes create luxury ambience with far fewer per-pixel lights. */}
-      <rectAreaLight width={8} height={3} intensity={4.8} color="#ffd8a3" position={[-7, 7.1, -18]} rotation={[-Math.PI / 2, 0, 0]} />
-      <rectAreaLight width={8} height={3} intensity={4.8} color="#ffd8a3" position={[7, 7.1, -18]} rotation={[-Math.PI / 2, 0, 0]} />
-      <rectAreaLight width={12} height={2.8} intensity={6} color="#ffe0ad" position={[0, 7.2, -34]} rotation={[0, 0, 0]} />
-
-      <mesh position={[0, 9.2, -20]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[30, 40]} />
-        <meshStandardMaterial {...plaster} color={stone} roughness={0.78} side={2} />
-      </mesh>
+      {/* Subtle lighting accents */}
+      <pointLight position={[0, 5, -30]} intensity={2} color="#ffd8a3" distance={20} decay={2} />
     </group>
   );
 }

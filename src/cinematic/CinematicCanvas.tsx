@@ -120,26 +120,7 @@ function getSceneMask(progress: number, department: Department | null) {
   return mask || LOBBY;
 }
 
-function LocalPbrEnvironment() {
-  const { gl, scene } = useThree();
 
-  useEffect(() => {
-    const pmrem = new THREE.PMREMGenerator(gl);
-    const room = new RoomEnvironment();
-    const environment = pmrem.fromScene(room, 0.035).texture;
-
-    scene.environment = environment;
-
-    return () => {
-      if (scene.environment === environment) scene.environment = null;
-      environment.dispose();
-      room.clear();
-      pmrem.dispose();
-    };
-  }, [gl, scene]);
-
-  return null;
-}
 
 function CinematicCamera({ department }: { department: Department | null }) {
   const { camera } = useThree();
@@ -216,29 +197,35 @@ function SceneDirector({ department }: { department: Department | null }) {
   );
 }
 
-function CinematicWorld({ department, quality }: { department: Department | null; quality: number }) {
-  const shadowSize = quality >= 0.72 ? 1024 : 512;
+import { Environment } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 
+function CinematicWorld({ department, quality }: { department: Department | null; quality: number }) {
   return (
     <>
-      <color attach="background" args={['#07101b']} />
-      <fog attach="fog" args={['#07101b', 58, 138]} />
-      <LocalPbrEnvironment />
+      <color attach="background" args={['#050505']} />
+      <fog attach="fog" args={['#050505', 20, 100]} />
+      
+      {/* Photorealistic IBL lighting instead of heavy shadow maps */}
+      <Environment preset="city" environmentIntensity={0.5} />
+      
       <CinematicCamera department={department} />
-      <ambientLight intensity={0.2} color="#ffe8cb" />
-      <hemisphereLight args={['#fff0d8', '#17110c', 0.44]} />
-      <directionalLight
-        position={[22, 28, 28]}
-        intensity={1.28}
-        color="#ffe3b0"
-        castShadow
-        shadow-bias={-0.0004}
-        shadow-mapSize-width={shadowSize}
-        shadow-mapSize-height={shadowSize}
-      >
-        <orthographicCamera attach="shadow-camera" args={[-35, 35, 35, -35, 0.5, 130]} />
-      </directionalLight>
+      
+      {/* Subtle fill light */}
+      <ambientLight intensity={0.15} color="#fff0d8" />
+      
       <SceneDirector department={department} />
+
+      {/* Luxury Bloom for glass and metals */}
+      <EffectComposer>
+        <Bloom 
+          luminanceThreshold={1.2} 
+          mipmapBlur 
+          intensity={1.5} 
+          levels={8} 
+          opacity={0.8}
+        />
+      </EffectComposer>
     </>
   );
 }

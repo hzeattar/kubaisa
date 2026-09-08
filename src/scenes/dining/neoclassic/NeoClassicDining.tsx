@@ -1,81 +1,103 @@
-import { RoundedBox } from '@react-three/drei';
-import { useArchitecturalTextures, useClassicFabricTexture } from '../../../components/3d/Materials';
+import React from 'react';
+import { Float, MeshReflectorMaterial, MeshTransmissionMaterial, Text, ContactShadows } from '@react-three/drei';
 
-export function NeoClassicDining() {
-  const { plaster, wood } = useArchitecturalTextures();
-  const fabric = useClassicFabricTexture();
+function LuxuryClassicRoomShell() {
   return (
     <group>
-      {/* Floor */}
-      <mesh position={[0, -0.05, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#3a322b" roughness={0.7} />
+      {/* Glossy Reflector Floor - Warm */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[30, 40]} />
+        <MeshReflectorMaterial
+          blur={[300, 100]}
+          resolution={1024}
+          mixBlur={1}
+          mixStrength={40}
+          roughness={0.15}
+          depthScale={1.2}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.4}
+          color="#0f0d0a"
+          metalness={0.4}
+        />
+      </mesh>
+
+      <ContactShadows position={[0, 0, 0]} scale={40} blur={3} far={10} opacity={0.5} color="#4a3b2c" />
+
+      {/* Back Wall */}
+      <mesh position={[0, 6, -15]} receiveShadow>
+        <boxGeometry args={[30, 12, 1]} />
+        <meshStandardMaterial color="#1a1510" roughness={0.3} metalness={0.5} />
       </mesh>
       
-      {/* Back Wall with Panels */}
-      <group position={[0, 2, -4]}>
-        <mesh receiveShadow>
-          <boxGeometry args={[14, 4, 0.2]} />
-          <meshStandardMaterial {...plaster} color="#d9d1c7" />
-        </mesh>
-        <mesh position={[-2, 0, 0.15]} receiveShadow>
-          <boxGeometry args={[2, 3, 0.1]} />
-          <meshStandardMaterial {...plaster} color="#e3ddd5" />
-        </mesh>
-        <mesh position={[2, 0, 0.15]} receiveShadow>
-          <boxGeometry args={[2, 3, 0.1]} />
-          <meshStandardMaterial {...plaster} color="#e3ddd5" />
-        </mesh>
-      </group>
-
-      {/* Classic Dining Table */}
-      <group position={[0, 0, -1]}>
-        {/* Table Top */}
-        <RoundedBox args={[3, 0.15, 1.4]} position={[0, 0.75, 0]} radius={0.02} smoothness={2} castShadow receiveShadow>
-          <meshStandardMaterial {...wood} color="#3b2b1f" />
-        </RoundedBox>
-        {/* Carved Legs (Simplified) */}
-        <mesh position={[-1.2, 0.375, 0]} castShadow>
-          <cylinderGeometry args={[0.15, 0.2, 0.75, 16]} />
-          <meshStandardMaterial {...wood} color="#3b2b1f" />
-        </mesh>
-        <mesh position={[1.2, 0.375, 0]} castShadow>
-          <cylinderGeometry args={[0.15, 0.2, 0.75, 16]} />
-          <meshStandardMaterial {...wood} color="#3b2b1f" />
-        </mesh>
-      </group>
-
-      {/* Chairs */}
-      {[
-        [-1, -0.7], [0, -0.7], [1, -0.7],
-        [-1, 0.7], [0, 0.7], [1, 0.7],
-      ].map((pos, i) => (
-        <group key={i} position={[pos[0], 0, -1 + pos[1]]} rotation={[0, pos[1] > 0 ? Math.PI : 0, 0]}>
-          <RoundedBox args={[0.55, 0.15, 0.5]} position={[0, 0.45, 0]} radius={0.05} castShadow>
-            <meshStandardMaterial {...fabric} color="#9c8c7d" />
-          </RoundedBox>
-          {/* Classic Oval Backrest */}
-          <mesh position={[0, 0.85, -0.2]} castShadow rotation={[0.1 + Math.PI/2, 0, 0]}>
-            <cylinderGeometry args={[0.25, 0.25, 0.1]} />
-            <meshStandardMaterial {...fabric} color="#9c8c7d" />
-          </mesh>
-          <mesh position={[0, 0.85, -0.22]} castShadow rotation={[0.1 + Math.PI/2, 0, 0]}>
-            <cylinderGeometry args={[0.28, 0.28, 0.08]} />
-            <meshStandardMaterial {...wood} color="#e8cd9c" /> {/* Gilded frame */}
-          </mesh>
-          <mesh position={[-0.2, 0.225, 0.15]} castShadow><cylinderGeometry args={[0.03, 0.02, 0.45]} /><meshStandardMaterial {...wood} color="#3b2b1f" /></mesh>
-          <mesh position={[0.2, 0.225, 0.15]} castShadow><cylinderGeometry args={[0.03, 0.02, 0.45]} /><meshStandardMaterial {...wood} color="#3b2b1f" /></mesh>
-          <mesh position={[-0.2, 0.225, -0.15]} castShadow><cylinderGeometry args={[0.03, 0.02, 0.45]} /><meshStandardMaterial {...wood} color="#3b2b1f" /></mesh>
-          <mesh position={[0.2, 0.225, -0.15]} castShadow><cylinderGeometry args={[0.03, 0.02, 0.45]} /><meshStandardMaterial {...wood} color="#3b2b1f" /></mesh>
-        </group>
-      ))}
-
-      {/* Crystal Chandelier (Proxy) */}
-      <group position={[0, 2.5, -1]}>
-        <mesh position={[0, 0.5, 0]}><cylinderGeometry args={[0.02, 0.02, 1]} /><meshStandardMaterial color="#e8cd9c" /></mesh>
-        <mesh position={[0, 0, 0]}><cylinderGeometry args={[0.4, 0.01, 0.1, 8]} /><meshStandardMaterial color="#e8cd9c" /></mesh>
-        <mesh position={[0, -0.2, 0]}><sphereGeometry args={[0.1]} /><meshStandardMaterial color="#fff" emissive="#ffe2b6" emissiveIntensity={1} /></mesh>
-      </group>
+      {/* Side Walls */}
+      <mesh position={[-15, 6, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[40, 12, 1]} />
+        <meshStandardMaterial color="#14110d" roughness={0.4} metalness={0.4} />
+      </mesh>
+      <mesh position={[15, 6, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[40, 12, 1]} />
+        <meshStandardMaterial color="#14110d" roughness={0.4} metalness={0.4} />
+      </mesh>
     </group>
   );
 }
+
+function ClassicPedestal({ position, label }: { position: [number, number, number], label: string }) {
+  return (
+    <group position={position}>
+      {/* Base */}
+      <mesh position={[0, 0.3, 0]}>
+        <cylinderGeometry args={[2.5, 2.6, 0.6, 64]} />
+        <meshStandardMaterial color="#1f1a14" metalness={0.3} roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.65, 0]}>
+        <cylinderGeometry args={[2.4, 2.5, 0.1, 64]} />
+        <meshStandardMaterial color="#c19d5e" metalness={0.9} roughness={0.2} />
+      </mesh>
+
+      {/* Abstract Glass Placeholder */}
+      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
+        <mesh position={[0, 3, 0]}>
+          <cylinderGeometry args={[1.5, 1.5, 3, 32]} />
+          <MeshTransmissionMaterial 
+            backside
+            samples={4}
+            thickness={3}
+            chromaticAberration={0.05}
+            color="#f8ecd5" 
+          />
+        </mesh>
+      </Float>
+
+      {/* Label */}
+      <Text
+        position={[0, 5.5, 0]}
+        fontSize={0.4}
+        color="#c19d5e"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.2}
+      >
+        {label}
+      </Text>
+
+      {/* Spotlight */}
+      <pointLight position={[0, 6, 0]} intensity={1.5} color="#ffd6a3" distance={15} />
+    </group>
+  );
+}
+
+export const NeoClassicDining: React.FC = () => {
+  return (
+    <group>
+      <LuxuryClassicRoomShell />
+      
+      {/* Centerpiece Pedestal */}
+      <ClassicPedestal position={[0, 0, -2]} label="NEO-CLASSIC DINING COLLECTION" />
+      
+      {/* Side Pedestals */}
+      <ClassicPedestal position={[-7, 0, 2]} label="DINING CHAIR" />
+      <ClassicPedestal position={[7, 0, 2]} label="DINING TABLE" />
+    </group>
+  );
+};

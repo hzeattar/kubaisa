@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import Lenis from 'lenis';
 import { CinematicVisual } from './cinematic/CinematicVisual';
 import { cinematicScroll } from './cinematic/scrollState';
 import { InteractiveRoomExperience } from './interactive/InteractiveRoomExperience';
@@ -121,31 +122,39 @@ export default function App() {
   }, [language]);
 
   useEffect(() => {
+    // Initialize Lenis
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+    });
+
     let raf = 0;
 
-    const update = () => {
+    const update = (time: number) => {
+      lenis.raf(time);
+      
       const journeyEnd = document.getElementById(department ? 'room-gate' : 'gate');
       const journeyBottom = journeyEnd
         ? journeyEnd.offsetTop + journeyEnd.offsetHeight - window.innerHeight
         : document.documentElement.scrollHeight - window.innerHeight;
       const max = Math.max(1, journeyBottom);
+      
       cinematicScroll.progress = Math.min(1, Math.max(0, window.scrollY / max));
       cinematicScroll.viewportHeight = window.innerHeight;
-      raf = 0;
+      
+      raf = window.requestAnimationFrame(update);
     };
 
-    const requestUpdate = () => {
-      if (!raf) raf = window.requestAnimationFrame(update);
-    };
-
-    update();
-    window.addEventListener('scroll', requestUpdate, { passive: true });
-    window.addEventListener('resize', requestUpdate);
+    raf = window.requestAnimationFrame(update);
 
     return () => {
-      window.removeEventListener('scroll', requestUpdate);
-      window.removeEventListener('resize', requestUpdate);
       if (raf) window.cancelAnimationFrame(raf);
+      lenis.destroy();
     };
   }, [department]);
 

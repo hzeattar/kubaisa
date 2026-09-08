@@ -1,77 +1,99 @@
-import { RoundedBox } from '@react-three/drei';
-import { useArchitecturalTextures, useModernFabricTexture } from '../../../components/3d/Materials';
+import React from 'react';
+import { Float, MeshReflectorMaterial, MeshTransmissionMaterial, Text, ContactShadows } from '@react-three/drei';
 
-export function ModernBedroom() {
-  const { plaster, wood } = useArchitecturalTextures();
-  const fabric = useModernFabricTexture();
+function LuxuryRoomShell() {
   return (
     <group>
-      {/* Floor */}
-      <mesh position={[0, -0.05, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial {...wood} color="#a69482" />
+      {/* Glossy Reflector Floor */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[30, 40]} />
+        <MeshReflectorMaterial
+          blur={[300, 100]}
+          resolution={1024}
+          mixBlur={1}
+          mixStrength={40}
+          roughness={0.15}
+          depthScale={1.2}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.4}
+          color="#050505"
+          metalness={0.5}
+        />
+      </mesh>
+
+      <ContactShadows position={[0, 0, 0]} scale={40} blur={3} far={10} opacity={0.5} color="#111111" />
+
+      {/* Back Wall */}
+      <mesh position={[0, 6, -15]} receiveShadow>
+        <boxGeometry args={[30, 12, 1]} />
+        <meshStandardMaterial color="#080808" roughness={0.3} metalness={0.5} />
       </mesh>
       
-      {/* Back Wall with hidden light panel */}
-      <group position={[0, 2, -4]}>
-        <mesh receiveShadow>
-          <boxGeometry args={[14, 4, 0.2]} />
-          <meshStandardMaterial {...plaster} color="#cac3ba" />
-        </mesh>
-        {/* Accent Wood Panel */}
-        <mesh position={[0, 0, 0.15]} receiveShadow>
-          <boxGeometry args={[4, 4, 0.1]} />
-          <meshStandardMaterial {...wood} color="#3d352d" />
-        </mesh>
-        {/* LED Strip */}
-        <mesh position={[0, 0, 0.2]}>
-          <boxGeometry args={[4.05, 4.05, 0.01]} />
-          <meshStandardMaterial color="#fff" emissive="#ffe6c2" emissiveIntensity={1.5} />
-        </mesh>
-      </group>
-
-      {/* Modern Bed */}
-      <group position={[0, 0, -2.5]}>
-        {/* Base */}
-        <RoundedBox args={[2, 0.3, 2.2]} position={[0, 0.15, 0]} radius={0.02} castShadow receiveShadow>
-          <meshStandardMaterial {...fabric} color="#5e5a56" />
-        </RoundedBox>
-        {/* Mattress */}
-        <RoundedBox args={[1.9, 0.2, 2.1]} position={[0, 0.4, 0]} radius={0.05} castShadow receiveShadow>
-          <meshStandardMaterial color="#f0efe9" />
-        </RoundedBox>
-        {/* Pillows */}
-        <RoundedBox args={[0.7, 0.1, 0.4]} position={[-0.45, 0.55, -0.7]} radius={0.05} castShadow>
-          <meshStandardMaterial color="#e0ded6" />
-        </RoundedBox>
-        <RoundedBox args={[0.7, 0.1, 0.4]} position={[0.45, 0.55, -0.7]} radius={0.05} castShadow>
-          <meshStandardMaterial color="#e0ded6" />
-        </RoundedBox>
-        {/* Duvet */}
-        <mesh position={[0, 0.52, 0.3]} castShadow>
-          <boxGeometry args={[1.95, 0.05, 1.4]} />
-          <meshStandardMaterial {...fabric} color="#7a7269" />
-        </mesh>
-      </group>
-
-      {/* Nightstands */}
-      {[-1.5, 1.5].map((x) => (
-        <group key={x} position={[x, 0, -3.2]}>
-          <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
-            <boxGeometry args={[0.6, 0.6, 0.4]} />
-            <meshStandardMaterial color="#2b2825" />
-          </mesh>
-          {/* Lamp */}
-          <mesh position={[0, 0.6, 0]}>
-            <cylinderGeometry args={[0.02, 0.05, 0.2]} />
-            <meshStandardMaterial color="#111" />
-          </mesh>
-          <mesh position={[0, 0.8, 0]}>
-            <sphereGeometry args={[0.1]} />
-            <meshStandardMaterial color="#fff" emissive="#ffddaa" emissiveIntensity={1} />
-          </mesh>
-        </group>
-      ))}
+      {/* Side Walls */}
+      <mesh position={[-15, 6, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[40, 12, 1]} />
+        <meshStandardMaterial color="#080808" roughness={0.4} metalness={0.4} />
+      </mesh>
+      <mesh position={[15, 6, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <boxGeometry args={[40, 12, 1]} />
+        <meshStandardMaterial color="#080808" roughness={0.4} metalness={0.4} />
+      </mesh>
     </group>
   );
 }
+
+function ProductPedestal({ position, label }: { position: [number, number, number], label: string }) {
+  return (
+    <group position={position}>
+      {/* Base */}
+      <mesh position={[0, 0.3, 0]}>
+        <cylinderGeometry args={[2.5, 2.6, 0.6, 64]} />
+        <meshStandardMaterial color="#111111" metalness={0.3} roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.65, 0]}>
+        <cylinderGeometry args={[2.4, 2.5, 0.1, 64]} />
+        <meshStandardMaterial color="#ffffff" metalness={0.9} roughness={0.2} />
+      </mesh>
+
+      {/* Abstract Glass Placeholder */}
+      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
+        <mesh position={[0, 3, 0]}>
+          <cylinderGeometry args={[1.5, 1.5, 3, 32]} />
+          <MeshTransmissionMaterial 
+            backside
+            samples={4}
+            thickness={3}
+            chromaticAberration={0.05}
+            color="#d5e4ec" 
+          />
+        </mesh>
+      </Float>
+
+      {/* Label */}
+      <Text
+        position={[0, 5.5, 0]}
+        fontSize={0.4}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.2}
+      >
+        {label}
+      </Text>
+
+      {/* Spotlight */}
+      <pointLight position={[0, 6, 0]} intensity={1.5} color="#ffffff" distance={15} />
+    </group>
+  );
+}
+
+export const ModernBedroom: React.FC = () => {
+  return (
+    <group>
+      <LuxuryRoomShell />
+      <ProductPedestal position={[0, 0, -2]} label="MODERN BEDROOM COLLECTION" />
+      <ProductPedestal position={[-7, 0, 2]} label="VIEW PRODUCT" />
+      <ProductPedestal position={[7, 0, 2]} label="VIEW DETAILS" />
+    </group>
+  );
+};
