@@ -20,7 +20,7 @@ export function NeoClassicWingHall() {
         />
       </mesh>
 
-      <ContactShadows position={[0, 0, -25]} scale={40} blur={3} far={10} opacity={0.5} color="#4a3b2c" />
+      <ContactShadows frames={1} resolution={256} position={[0, 0, -25]} scale={40} blur={3} far={10} opacity={0.5} color="#4a3b2c" />
 
       {/* Abstract Classic Exhibits (Warm glowing glass arches) */}
       {[

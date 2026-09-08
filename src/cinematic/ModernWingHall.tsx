@@ -20,7 +20,7 @@ export function ModernWingHall() {
         />
       </mesh>
 
-      <ContactShadows position={[0, 0, -25]} scale={40} blur={2.5} far={10} opacity={0.4} />
+      <ContactShadows frames={1} resolution={256} position={[0, 0, -25]} scale={40} blur={2.5} far={10} opacity={0.4} />
 
       {/* Abstract Modern Exhibits (Floating glowing displays) */}
       {[

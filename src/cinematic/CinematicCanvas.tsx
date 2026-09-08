@@ -215,17 +215,6 @@ function CinematicWorld({ department, quality }: { department: Department | null
       <ambientLight intensity={0.15} color="#fff0d8" />
       
       <SceneDirector department={department} />
-
-      {/* Luxury Bloom for glass and metals */}
-      <EffectComposer>
-        <Bloom 
-          luminanceThreshold={1.2} 
-          mipmapBlur 
-          intensity={1.5} 
-          levels={8} 
-          opacity={0.8}
-        />
-      </EffectComposer>
     </>
   );
 }

@@ -21,7 +21,7 @@ export function CinematicLobby() {
       </mesh>
 
       {/* Ground Contact Shadows for grounded realism without heavy shadowmaps */}
-      <ContactShadows position={[0, 0, -20]} scale={50} blur={2} far={10} opacity={0.5} />
+      <ContactShadows frames={1} resolution={256} position={[0, 0, -20]} scale={50} blur={2} far={10} opacity={0.5} />
 
       {/* Abstract Glowing Architecture (Glass Panels) */}
       {[-1, 1].map((side) => (

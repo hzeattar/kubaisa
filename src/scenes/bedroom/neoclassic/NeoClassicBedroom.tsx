@@ -21,7 +21,7 @@ function LuxuryRoomShell() {
         />
       </mesh>
 
-      <ContactShadows position={[0, 0, 0]} scale={40} blur={3} far={10} opacity={0.5} color="#4a3b2c" />
+      <ContactShadows frames={1} resolution={256} position={[0, 0, 0]} scale={40} blur={3} far={10} opacity={0.5} color="#4a3b2c" />
 
       {/* Back Wall */}
       <mesh position={[0, 6, -15]} receiveShadow>
