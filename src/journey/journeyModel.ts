@@ -46,23 +46,23 @@ const MODERN_ROOMS: JourneyRoom[] = [
   {
     id: 'dining', order: 2,
     titleAr: 'السفرة', titleEn: 'Dining',
-    subtitleAr: 'معاينة من الهول — النسخة الكاملة قيد التجهيز',
-    subtitleEn: 'Hall preview — full room is being prepared',
-    availability: 'preview',
+    subtitleAr: 'غرفة تفاعلية جاهزة — تجول وشاهد القطع والتفاصيل',
+    subtitleEn: 'Interactive room ready — explore furniture and details',
+    availability: 'ready',
   },
   {
     id: 'bedroom', order: 3,
     titleAr: 'غرف النوم', titleEn: 'Bedrooms',
-    subtitleAr: 'معاينة من الهول — النسخة الكاملة قيد التجهيز',
-    subtitleEn: 'Hall preview — full room is being prepared',
-    availability: 'preview',
+    subtitleAr: 'غرفة تفاعلية جاهزة — تجول وشاهد القطع والتفاصيل',
+    subtitleEn: 'Interactive room ready — explore furniture and details',
+    availability: 'ready',
   },
   {
     id: 'kids', order: 4,
     titleAr: 'الأطفال والشباب', titleEn: 'Kids & Youth',
-    subtitleAr: 'معاينة من الهول — النسخة الكاملة قيد التجهيز',
-    subtitleEn: 'Hall preview — full room is being prepared',
-    availability: 'preview',
+    subtitleAr: 'غرفة تفاعلية جاهزة — تجول وشاهد القطع والتفاصيل',
+    subtitleEn: 'Interactive room ready — explore furniture and details',
+    availability: 'ready',
   },
 ];
 
@@ -77,16 +77,16 @@ const CLASSIC_ROOMS: JourneyRoom[] = [
   {
     id: 'dining', order: 2,
     titleAr: 'السفرة', titleEn: 'Dining',
-    subtitleAr: 'معاينة من الهول — النسخة الكاملة قيد التجهيز',
-    subtitleEn: 'Hall preview — full room is being prepared',
-    availability: 'preview',
+    subtitleAr: 'غرفة تفاعلية جاهزة — تجول وشاهد القطع والتفاصيل',
+    subtitleEn: 'Interactive room ready — explore furniture and details',
+    availability: 'ready',
   },
   {
     id: 'bedroom', order: 3,
     titleAr: 'غرف النوم', titleEn: 'Bedrooms',
-    subtitleAr: 'معاينة من الهول — النسخة الكاملة قيد التجهيز',
-    subtitleEn: 'Hall preview — full room is being prepared',
-    availability: 'preview',
+    subtitleAr: 'غرفة تفاعلية جاهزة — تجول وشاهد القطع والتفاصيل',
+    subtitleEn: 'Interactive room ready — explore furniture and details',
+    availability: 'ready',
   },
 ];
 

@@ -35,6 +35,27 @@ const ROOM_VIEWS: Record<string, Viewpoint[]> = {
     { labelAr: 'وسط الصالون', labelEn: 'Salon center', position: [-4.6, 1.8, 1.9], target: [0, 1.15, -3.5] },
     { labelAr: 'تفاصيل الصالون', labelEn: 'Salon detail', position: [3.5, 1.65, 0.7], target: [0, 1.2, -4] },
   ],
+  'modern-dining': [
+    { labelAr: 'المدخل', labelEn: 'Entrance', position: [0, 2, 7], target: [0, 1, -1] },
+    { labelAr: 'مائدة السفرة', labelEn: 'Dining table', position: [-3, 2, 0], target: [0, 1, -1] },
+  ],
+  'classic-dining': [
+    { labelAr: 'المدخل', labelEn: 'Entrance', position: [0, 2, 7], target: [0, 1, -1] },
+    { labelAr: 'مائدة السفرة', labelEn: 'Dining table', position: [-3, 2, 0], target: [0, 1, -1] },
+  ],
+  'modern-bedroom': [
+    { labelAr: 'المدخل', labelEn: 'Entrance', position: [0, 2, 7], target: [0, 1, -2.5] },
+    { labelAr: 'السرير', labelEn: 'Bed view', position: [-3, 1.8, -1], target: [0, 1, -2.5] },
+  ],
+  'classic-bedroom': [
+    { labelAr: 'المدخل', labelEn: 'Entrance', position: [0, 2, 7], target: [0, 1, -2.5] },
+    { labelAr: 'السرير', labelEn: 'Bed view', position: [-3, 1.8, -1], target: [0, 1, -2.5] },
+  ],
+  'modern-kids': [
+    { labelAr: 'المدخل', labelEn: 'Entrance', position: [0, 2, 7], target: [0, 1, -2.5] },
+    { labelAr: 'السرير', labelEn: 'Bed view', position: [-2, 1.5, 0], target: [-1.5, 1, -2.5] },
+    { labelAr: 'المكتب', labelEn: 'Desk area', position: [2, 1.5, 0], target: [1.5, 1, -3] },
+  ],
 };
 
 function RoomCamera({ room, viewIndex }: { room: InteractiveRoom; viewIndex: number }) {
@@ -97,6 +118,46 @@ function PriceHotspot({
   );
 }
 
+import { ModernDining } from '../scenes/dining/modern/ModernDining';
+import { NeoClassicDining } from '../scenes/dining/neoclassic/NeoClassicDining';
+import { ModernBedroom } from '../scenes/bedroom/modern/ModernBedroom';
+import { NeoClassicBedroom } from '../scenes/bedroom/neoclassic/NeoClassicBedroom';
+// Kids room (only modern for now)
+import { ModernKidsRoom } from '../scenes/bedroom/kids/ModernKidsRoom';
+
+const SCENES: Record<string, React.FC> = {
+  'modern-living': ModernLiving,
+  'classic-living': NeoClassicLiving,
+  'modern-dining': ModernDining,
+  'classic-dining': NeoClassicDining,
+  'modern-bedroom': ModernBedroom,
+  'classic-bedroom': NeoClassicBedroom,
+  'modern-kids': ModernKidsRoom,
+  'classic-kids': ModernKidsRoom, // Fallback
+};
+
+const PRODUCT_IDS: Record<string, string> = {
+  'modern-living': 'sofa-modern-01',
+  'classic-living': 'salon-classic-01',
+  'modern-dining': 'dining-modern-01',
+  'classic-dining': 'dining-classic-01',
+  'modern-bedroom': 'bedroom-modern-01',
+  'classic-bedroom': 'bedroom-classic-01',
+  'modern-kids': 'kids-room-01',
+  'classic-kids': 'kids-room-01',
+};
+
+const HOTSPOT_POSITIONS: Record<string, [number, number, number]> = {
+  'modern-living': [0, 2.25, -4.6],
+  'classic-living': [0, 2.6, -5.2],
+  'modern-dining': [0, 2.0, -1],
+  'classic-dining': [0, 2.0, -1],
+  'modern-bedroom': [0, 2.0, -2],
+  'classic-bedroom': [0, 2.0, -2],
+  'modern-kids': [0, 2.0, -2],
+  'classic-kids': [0, 2.0, -2],
+};
+
 function RoomScene({
   room,
   language,
@@ -107,9 +168,10 @@ function RoomScene({
   onOpenProduct: (id: string) => void;
 }) {
   const classic = room.department === 'classic';
-  const SceneComponent = classic ? NeoClassicLiving : ModernLiving;
-  const productId = classic ? 'salon-classic-01' : 'sofa-modern-01';
-  const hotspotPos: [number, number, number] = classic ? [0, 2.6, -5.2] : [0, 2.25, -4.6];
+  const key = `${room.department}-${room.room}`;
+  const SceneComponent = SCENES[key] || SCENES['modern-living'];
+  const productId = PRODUCT_IDS[key] || PRODUCT_IDS['modern-living'];
+  const hotspotPos = HOTSPOT_POSITIONS[key] || HOTSPOT_POSITIONS['modern-living'];
 
   return (
     <>
@@ -131,6 +193,8 @@ function RoomScene({
   );
 }
 
+import { getRoomsForDepartment } from '../journey/journeyModel';
+
 export default function InteractiveRoomExperienceImpl({ room, language, onClose }: Props) {
   const [viewIndex, setViewIndex] = useState(0);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
@@ -141,9 +205,10 @@ export default function InteractiveRoomExperienceImpl({ room, language, onClose 
   const key = `${room.department}-${room.room}`;
   const views = ROOM_VIEWS[key] || ROOM_VIEWS['modern-living'];
 
-  const roomTitle = language === 'ar'
-    ? room.department === 'modern' ? 'المعيشة المودرن' : 'الصالونات والنيو كلاسيك'
-    : room.department === 'modern' ? 'Modern Living' : 'Neo-Classical Salon';
+  const roomConfig = getRoomsForDepartment(room.department).find((r) => r.id === room.room);
+  const roomTitle = roomConfig 
+    ? (language === 'ar' ? roomConfig.titleAr : roomConfig.titleEn) 
+    : (language === 'ar' ? 'غرفة تفاعلية' : 'Interactive Room');
 
   const moveView = (direction: 1 | -1) => {
     if (selectedProductId || isClosing) return;
@@ -299,9 +364,15 @@ export default function InteractiveRoomExperienceImpl({ room, language, onClose 
           <h2>{language === 'ar' ? selectedProduct.nameAr : selectedProduct.nameEn}</h2>
           <strong className="product-sheet-price">{displayedPrice}</strong>
           <p>{language === 'ar' ? selectedProduct.descriptionAr : selectedProduct.descriptionEn}</p>
-          <button type="button" className="product-inquiry" disabled={!selectedProduct.inquiryEnabled}>
+          <a 
+            href={`https://wa.me/201000000000?text=${encodeURIComponent(language === 'ar' ? `مرحباً، أود الاستفسار عن القطعة: ${selectedProduct.nameAr}` : `Hello, I would like to inquire about: ${selectedProduct.nameEn}`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className={`product-inquiry ${!selectedProduct.inquiryEnabled ? 'is-disabled' : ''}`}
+            onClick={(e) => { if (!selectedProduct.inquiryEnabled) e.preventDefault(); }}
+          >
             {language === 'ar' ? 'استفسر عن القطعة' : 'Ask about this piece'}
-          </button>
+          </a>
         </aside>
       )}
     </section>
